@@ -1,0 +1,10 @@
+{
+    "name": "wilkques/php-helper",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ]
+    }
+}
