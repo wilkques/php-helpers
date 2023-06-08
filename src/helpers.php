@@ -107,7 +107,7 @@ if (!function_exists('accessible')) {
     }
 }
 
-if (!function_exists('accessible')) {
+if (!function_exists('exists')) {
     /**
      * Determine if the given key exists in the provided array.
      *
@@ -239,7 +239,7 @@ if (!function_exists('array_take_off_recursive')) {
     }
 }
 
-if (! function_exists('array_merge_recursive_distinct')) {
+if (!function_exists('array_merge_recursive_distinct')) {
 
     /**
      * @param array<int|string, mixed> $array1
@@ -259,5 +259,26 @@ if (! function_exists('array_merge_recursive_distinct')) {
         }
 
         return $merged;
+    }
+}
+
+if (!function_exists('dir_scan')) {
+    /**
+     * @param string $dir
+     * 
+     * @return \Generator<string>
+     */
+    function dir_scan($dir)
+    {
+        foreach (scandir($dir) as $path) {
+            if (!in_array($path, array(".", ".."))) {
+                $findPath = $dir . DIRECTORY_SEPARATOR;
+                if (is_dir($findPath . $path)) {
+                    dir_scan($findPath . $path);
+                } else {
+                    yield $findPath . $path;
+                }
+            }
+        }
     }
 }
