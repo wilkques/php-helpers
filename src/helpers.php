@@ -176,7 +176,7 @@ if (!function_exists('data_get')) {
     }
 }
 
-if (!file_exists('is_iterable')) {
+if (!function_exists('is_iterable')) {
     function is_iterable($obj)
     {
         return is_array($obj) || $obj instanceof \Traversable;
