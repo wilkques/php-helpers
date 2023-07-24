@@ -227,31 +227,34 @@ if (!function_exists('array_take_off_recursive')) {
     function array_take_off_recursive(&$array, $key, $default = null)
     {
         $keys = explode('.', $key);
-        $currentKey = array_shift($keys);
 
-        if ($currentKey === '*') {
-            $values = array();
+        while (($currentKey = array_shift($keys)) !== null) {
+            if ($currentKey === '*') {
+                $values = array();
 
-            foreach ($array as $subKey => &$subArray) {
-                if (empty($keys)) {
-                    $values[] = $subArray;
-                    unset($array[$subKey]);
-                } else {
-                    $values[$subKey] = array_take_off_recursive($subArray, implode('.', $keys));
+                foreach ($array as $subKey => &$subArray) {
+                    if (empty($keys)) {
+                        $values[] = $subArray;
+                        unset($array[$subKey]);
+                    } else {
+                        $values[$subKey] = $subArray;
+                    }
                 }
+
+                return $values;
             }
 
-            return $values;
-        }
+            if (array_key_exists($currentKey, $array)) {
+                if (empty($keys)) {
+                    $target = $array[$currentKey];
+                    unset($array[$currentKey]);
 
-        if (array_key_exists($currentKey, $array)) {
-            if (empty($keys)) {
-                $target = $array[$currentKey];
-                unset($array[$currentKey]);
-
-                return $target;
+                    return $target;
+                } else {
+                    $array = &$array[$currentKey];
+                }
             } else {
-                return array_take_off_recursive($array[$currentKey], implode('.', $keys));
+                return $default;
             }
         }
 
@@ -321,40 +324,38 @@ if (!function_exists('dir_scan')) {
 
 if (!function_exists('str_starts_with')) {
     /**
-	 * Determine if a given string starts with a given substring.
-	 *
-	 * @param  string  $haystack
-	 * @param  string|array  $needles
-	 * @return bool
-	 */
-	function str_starts_with($haystack, $needles)
-	{
-		foreach ((array) $needles as $needle)
-		{
-			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
-		}
+     * Determine if a given string starts with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|array  $needles
+     * @return bool
+     */
+    function str_starts_with($haystack, $needles)
+    {
+        foreach ((array) $needles as $needle) {
+            if ($needle != '' && strpos($haystack, $needle) === 0) return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 }
 
 if (!function_exists('str_ends_with')) {
     /**
-	 * Determine if a given string ends with a given substring.
-	 *
-	 * @param  string  $haystack
-	 * @param  string|array  $needles
-	 * @return bool
-	 */
-	function str_ends_with($haystack, $needles)
-	{
-		foreach ((array) $needles as $needle)
-		{
-			if ((string) $needle === substr($haystack, -strlen($needle))) return true;
-		}
+     * Determine if a given string ends with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|array  $needles
+     * @return bool
+     */
+    function str_ends_with($haystack, $needles)
+    {
+        foreach ((array) $needles as $needle) {
+            if ((string) $needle === substr($haystack, -strlen($needle))) return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 }
 
 if (!function_exists("ve")) {
