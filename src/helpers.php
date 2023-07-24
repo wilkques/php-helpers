@@ -9,7 +9,7 @@ if (!function_exists('string_snake')) {
     function string_snake($camelCase)
     {
         return preg_replace_callback(
-            ["/([A-Z]+)/", "/_([A-Z]+)([A-Z][a-z])/"],
+            array("/([A-Z]+)/", "/_([A-Z]+)([A-Z][a-z])/"),
             function ($matches) {
                 return "_" . lcfirst($matches[0]);
             },
@@ -32,6 +32,21 @@ if (!function_exists('array_key_sanke')) {
     }
 }
 
+if (!function_exists("array_only")) {
+    /**
+     * Get a subset of the items from the given array.
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * 
+     * @return array
+     */
+    function array_only($array, $keys)
+    {
+        return array_intersect_key($array, array_flip((array) $keys));
+    }
+}
+
 if (!function_exists('data_set')) {
     /**
      * Set an item on an array or object using dot notation.
@@ -48,7 +63,7 @@ if (!function_exists('data_set')) {
 
         if (($segment = array_shift($segments)) === '*') {
             if (!accessible($target)) {
-                $target = [];
+                $target = array();
             }
 
             if ($segments) {
@@ -63,7 +78,7 @@ if (!function_exists('data_set')) {
         } elseif (accessible($target)) {
             if ($segments) {
                 if (!exists($target, $segment)) {
-                    $target[$segment] = [];
+                    $target[$segment] = array();
                 }
 
                 data_set($target[$segment], $segments, $value, $overwrite);
@@ -73,7 +88,7 @@ if (!function_exists('data_set')) {
         } elseif (is_object($target)) {
             if ($segments) {
                 if (!isset($target->{$segment})) {
-                    $target->{$segment} = [];
+                    $target->{$segment} = array();
                 }
 
                 data_set($target->{$segment}, $segments, $value, $overwrite);
@@ -81,7 +96,7 @@ if (!function_exists('data_set')) {
                 $target->{$segment} = $value;
             }
         } else {
-            $target = [];
+            $target = array();
 
             if ($segments) {
                 data_set($target[$segment], $segments, $value, $overwrite);
@@ -154,7 +169,7 @@ if (!function_exists('data_get')) {
                     return value($default);
                 }
 
-                $result = [];
+                $result = array();
 
                 foreach ($target as $item) {
                     $result[] = data_get($item, $key);
@@ -244,23 +259,39 @@ if (!function_exists('array_take_off_recursive')) {
     }
 }
 
-if (!function_exists('array_merge_recursive_distinct')) {
+if (!function_exists('array_merge_distinct_recursive')) {
 
     /**
-     * @param array<int|string, mixed> $array1
-     * @param array<int|string, mixed> $array2
+     * @param array<int|string, mixed> ...$array
      *
      * @return array<int|string, mixed>
      */
-    function array_merge_recursive_distinct(array &$array1, array &$array2): array
+    function array_merge_distinct_recursive()
     {
-        $merged = $array1;
-        foreach ($array2 as $key => &$value) {
-            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
-                $merged[$key] = array_merge_recursive_distinct($merged[$key], $value);
-            } else {
-                $merged[$key] = $value;
+        $args = func_get_args();
+
+        $merged = current($args);
+
+        while (($current = current($args)) !== false) {
+            $stack = array(
+                array(&$merged, $current)
+            );
+
+            while (!empty($stack)) {
+                $item = array_pop($stack);
+                $target = &$item[0];
+                $source = $item[1];
+
+                foreach ($source as $key => $value) {
+                    if (is_array($value) && isset($target[$key]) && is_array($target[$key])) {
+                        $stack[] = array(&$target[$key], $value);
+                    } else {
+                        $target[$key] = $value;
+                    }
+                }
             }
+
+            next($args);
         }
 
         return $merged;
@@ -285,5 +316,104 @@ if (!function_exists('dir_scan')) {
                 }
             }
         }
+    }
+}
+
+if (!function_exists('str_starts_with')) {
+    /**
+	 * Determine if a given string starts with a given substring.
+	 *
+	 * @param  string  $haystack
+	 * @param  string|array  $needles
+	 * @return bool
+	 */
+	function str_starts_with($haystack, $needles)
+	{
+		foreach ((array) $needles as $needle)
+		{
+			if ($needle != '' && strpos($haystack, $needle) === 0) return true;
+		}
+
+		return false;
+	}
+}
+
+if (!function_exists('str_ends_with')) {
+    /**
+	 * Determine if a given string ends with a given substring.
+	 *
+	 * @param  string  $haystack
+	 * @param  string|array  $needles
+	 * @return bool
+	 */
+	function str_ends_with($haystack, $needles)
+	{
+		foreach ((array) $needles as $needle)
+		{
+			if ((string) $needle === substr($haystack, -strlen($needle))) return true;
+		}
+
+		return false;
+	}
+}
+
+if (!function_exists("ve")) {
+    function ve()
+    {
+        $args = func_get_args();
+
+        array_walk($args, function ($arg) {
+            var_export($arg);
+
+            echo PHP_EOL;
+        });
+    }
+}
+
+if (!function_exists("ved")) {
+    function ved()
+    {
+        $args = func_get_args();
+
+        call_user_func('ve', $args);
+
+        die;
+    }
+}
+
+if (!function_exists('json_error_check')) {
+    /**
+     * @return array
+     */
+    function json_error_check()
+    {
+        switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+                $message = ' - No errors';
+                break;
+            case JSON_ERROR_DEPTH:
+                $message = ' - Maximum stack depth exceeded';
+                break;
+            case JSON_ERROR_STATE_MISMATCH:
+                $message = ' - Underflow or the modes mismatch';
+                break;
+            case JSON_ERROR_CTRL_CHAR:
+                $message = ' - Unexpected control character found';
+                break;
+            case JSON_ERROR_SYNTAX:
+                $message = ' - Syntax error, malformed JSON';
+                break;
+            case JSON_ERROR_UTF8:
+                $message = ' - Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
+            default:
+                $message = ' - Unknown error';
+                break;
+        }
+
+        return [
+            'code'      => json_last_error(),
+            'message'   => $message
+        ];
     }
 }
