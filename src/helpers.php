@@ -309,13 +309,22 @@ if (!function_exists('dir_scan')) {
      */
     function dir_scan($dir)
     {
-        foreach (scandir($dir) as $path) {
-            if (!in_array($path, array(".", ".."))) {
-                $findPath = $dir . DIRECTORY_SEPARATOR;
-                if (is_dir($findPath . $path)) {
-                    dir_scan($findPath . $path);
-                } else {
-                    yield $findPath . $path;
+        $stack = new SplStack();
+
+        $stack->push($dir);
+
+        while (!$stack->isEmpty()) {
+            $currentDir = $stack->pop();
+
+            foreach (scandir($currentDir) as $path) {
+                if (!in_array($path, array(".", ".."))) {
+                    $findPath = $currentDir . DIRECTORY_SEPARATOR . $path;
+
+                    if (is_dir($findPath)) {
+                        $stack->push($findPath);
+                    } else {
+                        yield $findPath;
+                    }
                 }
             }
         }
