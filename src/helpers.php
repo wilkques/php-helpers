@@ -385,7 +385,7 @@ if (!function_exists("ved")) {
     {
         $args = func_get_args();
 
-        call_user_func('ve', extract($args));
+        call_user_func_array('ve', $args);
 
         die;
     }
