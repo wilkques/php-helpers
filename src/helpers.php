@@ -32,6 +32,62 @@ if (!function_exists('array_key_sanke')) {
     }
 }
 
+if (!function_exists('array_pluck')) {
+    /**
+     * @param array $array
+     * @param string $value
+     * @param string|null $key
+     * @param int|null $case Either CASE_UPPER or CASE_LOWER or null
+     * 
+     * @return array
+     */
+    function array_pluck(array $array, string $value, string $key = null, int $case = null)
+    {
+        $results = [];
+
+        if (count($array) > 0) {
+            foreach ($array as $item) {
+                $itemValue = $item[$value];
+
+                if (is_null($key)) {
+                    $results[] = $itemValue;
+                } else {
+                    $itemKey = $item[$key];
+
+                    $itemKey = $case === CASE_LOWER ? strtolower($itemKey) : ($case === CASE_UPPER ? strtoupper($itemKey) : $itemKey);
+
+                    $results[$itemKey] = $itemValue;
+                }
+            }
+        }
+
+        return $results;
+    }
+}
+
+if (!function_exists('array_map_with_keys')) {
+    /**
+     * @param array $array
+     * @param callable $callback
+     * 
+     * @return array
+     */
+    function array_map_with_keys(array $array, callable $callback)
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $assoc = $callback($value, $key);
+
+            foreach ($assoc as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return $result;
+    }
+}
+
 if (!function_exists("array_only")) {
     /**
      * Get a subset of the items from the given array.
