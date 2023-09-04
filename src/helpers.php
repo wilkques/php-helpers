@@ -88,6 +88,19 @@ if (!function_exists('array_map_with_keys')) {
     }
 }
 
+if (!function_exists('data_where')) {
+    /**
+     * @param array $array
+     * @param callable $callback
+     * 
+     * @return array
+     */
+    function data_where(array $array, callable $callback)
+    {
+        return data_where($array, $callback, ARRAY_FILTER_USE_BOTH);
+    }
+}
+
 if (!function_exists("array_only")) {
     /**
      * Get a subset of the items from the given array.
@@ -420,6 +433,21 @@ if (!function_exists('str_ends_with')) {
         }
 
         return false;
+    }
+}
+
+if (!function_exists('str_contains')) {
+    /**
+     * based on original work from the PHP Laravel framework
+     * 
+     * @param string $haystack
+     * @param string $needle
+     * 
+     * @return bool
+     */
+    function str_contains($haystack, $needle)
+    {
+        return $needle === '' || mb_substr_count($haystack, $needle, (empty($encoding) ? mb_internal_encoding() : $encoding)) > 0;
     }
 }
 
