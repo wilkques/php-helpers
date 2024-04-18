@@ -103,7 +103,7 @@ if (!function_exists('data_where')) {
 
 if (!function_exists("array_only")) {
     /**
-     * Get a subset of the items from the given array.
+     * 
      *
      * @param  array  $array
      * @param  array|string  $keys
@@ -113,6 +113,21 @@ if (!function_exists("array_only")) {
     function array_only($array, $keys)
     {
         return array_intersect_key($array, array_flip((array) $keys));
+    }
+}
+
+if (!function_exists("array_except")) {
+    /**
+     *
+     *
+     * @param  array  $array
+     * @param  array|string  $keys
+     * 
+     * @return array
+     */
+    function array_except($array, $keys)
+    {
+        return array_diff_key($array, array_flip((array) $keys));
     }
 }
 
