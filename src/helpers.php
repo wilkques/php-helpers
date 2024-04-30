@@ -1,5 +1,9 @@
 <?php
 
+use Wilkques\Helpers\Arrays;
+use Wilkques\Helpers\Objects;
+use Wilkques\Helpers\Strings;
+
 if (!function_exists('string_snake')) {
     /**
      * @param string $camelCase
@@ -8,13 +12,7 @@ if (!function_exists('string_snake')) {
      */
     function string_snake($camelCase)
     {
-        return preg_replace_callback(
-            array("/([A-Z]+)/", "/_([A-Z]+)([A-Z][a-z])/"),
-            function ($matches) {
-                return "_" . lcfirst($matches[0]);
-            },
-            $camelCase
-        );
+        return Strings::snake($camelCase);
     }
 }
 
@@ -28,7 +26,7 @@ if (!function_exists('array_key_sanke')) {
      */
     function array_key_sanke($array)
     {
-        return array_combine(string_snake(array_keys($array)), $array);
+        return Arrays::keySanke($array);
     }
 }
 
@@ -43,25 +41,7 @@ if (!function_exists('array_pluck')) {
      */
     function array_pluck(array $array, string $value, string $key = null, int $case = null)
     {
-        $results = [];
-
-        if (count($array) > 0) {
-            foreach ($array as $item) {
-                $itemValue = $item[$value];
-
-                if (is_null($key)) {
-                    $results[] = $itemValue;
-                } else {
-                    $itemKey = $item[$key];
-
-                    $itemKey = $case === CASE_LOWER ? strtolower($itemKey) : ($case === CASE_UPPER ? strtoupper($itemKey) : $itemKey);
-
-                    $results[$itemKey] = $itemValue;
-                }
-            }
-        }
-
-        return $results;
+       return Arrays::pluck($array, $value, $key, $case);
     }
 }
 
@@ -74,17 +54,20 @@ if (!function_exists('array_map_with_keys')) {
      */
     function array_map_with_keys(array $array, callable $callback)
     {
-        $result = [];
+        return Arrays::mapWithKeys($array, $callback);
+    }
+}
 
-        foreach ($array as $key => $value) {
-            $assoc = $callback($value, $key);
-
-            foreach ($assoc as $mapKey => $mapValue) {
-                $result[$mapKey] = $mapValue;
-            }
-        }
-
-        return $result;
+if (!function_exists('array_where')) {
+    /**
+     * @param array $array
+     * @param callable $callback
+     * 
+     * @return array
+     */
+    function array_where(array $array, callable $callback)
+    {
+        return Arrays::where($array, $callback);
     }
 }
 
@@ -97,7 +80,7 @@ if (!function_exists('data_where')) {
      */
     function data_where(array $array, callable $callback)
     {
-        return data_where($array, $callback, ARRAY_FILTER_USE_BOTH);
+        return Arrays::where($array, $callback);
     }
 }
 
@@ -112,7 +95,7 @@ if (!function_exists("array_only")) {
      */
     function array_only($array, $keys)
     {
-        return array_intersect_key($array, array_flip((array) $keys));
+        return Arrays::only($array, $keys);
     }
 }
 
@@ -127,7 +110,7 @@ if (!function_exists("array_except")) {
      */
     function array_except($array, $keys)
     {
-        return array_diff_key($array, array_flip((array) $keys));
+        return Arrays::except($array, $keys);
     }
 }
 
@@ -140,7 +123,7 @@ if (!function_exists("array_key_fields")) {
      */
     function array_key_fields($array, $sort)
     {
-        return array_intersect_key(array_combine($sort, $array), $array);
+        return Arrays::keyFields($array, $sort);
     }
 }
 
@@ -156,66 +139,7 @@ if (!function_exists('data_set')) {
      */
     function data_set(&$target, $key, $value, $overwrite = true)
     {
-        $segments = is_array($key) ? $key : explode('.', $key);
-
-        if (($segment = array_shift($segments)) === '*') {
-            if (!accessible($target)) {
-                $target = array();
-            }
-
-            if ($segments) {
-                foreach ($target as &$inner) {
-                    data_set($inner, $segments, $value, $overwrite);
-                }
-            } elseif ($overwrite) {
-                foreach ($target as &$inner) {
-                    $inner = $value;
-                }
-            }
-        } elseif (accessible($target)) {
-            if ($segments) {
-                if (!exists($target, $segment)) {
-                    $target[$segment] = array();
-                }
-
-                data_set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite || !exists($target, $segment)) {
-                $target[$segment] = $value;
-            }
-        } elseif (is_object($target)) {
-            if ($segments) {
-                if (!isset($target->{$segment})) {
-                    $target->{$segment} = array();
-                }
-
-                data_set($target->{$segment}, $segments, $value, $overwrite);
-            } elseif ($overwrite || !isset($target->{$segment})) {
-                $target->{$segment} = $value;
-            }
-        } else {
-            $target = array();
-
-            if ($segments) {
-                data_set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite) {
-                $target[$segment] = $value;
-            }
-        }
-
-        return $target;
-    }
-}
-
-if (!function_exists('accessible')) {
-    /**
-     * Determine whether the given value is array accessible.
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    function accessible($value)
-    {
-        return is_array($value) || $value instanceof \ArrayAccess;
+        return Objects::set($target, $key, $value, $overwrite);
     }
 }
 
@@ -229,11 +153,7 @@ if (!function_exists('exists')) {
      */
     function exists($array, $key)
     {
-        if ($array instanceof \ArrayAccess) {
-            return $array->offsetExists($key);
-        }
-
-        return array_key_exists($key, $array);
+        return Arrays::exists($array, $key);
     }
 }
 
@@ -248,50 +168,21 @@ if (!function_exists('data_get')) {
      */
     function data_get($target, $key, $default = null)
     {
-        if (is_null($key)) {
-            return $target;
-        }
-
-        $key = is_array($key) ? $key : explode('.', $key);
-
-        foreach ($key as $i => $segment) {
-            unset($key[$i]);
-
-            if (is_null($segment)) {
-                return $target;
-            }
-
-            if ($segment === '*') {
-                if (!is_iterable($target)) {
-                    return value($default);
-                }
-
-                $result = array();
-
-                foreach ($target as $item) {
-                    $result[] = data_get($item, $key);
-                }
-
-                return $result;
-            }
-
-            if (is_array($target) && array_key_exists($segment, $target)) {
-                $target = $target[$segment];
-            } elseif (is_object($target) && isset($target->{$segment})) {
-                $target = $target->{$segment};
-            } else {
-                return value($default);
-            }
-        }
-
-        return $target;
+        return Objects::get($target, $key, $default);
     }
 }
 
 if (!function_exists('is_iterable')) {
+    /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @param  \Traversable|array  $array
+     * 
+     * @return bool
+     */
     function is_iterable($obj)
     {
-        return is_array($obj) || $obj instanceof \Traversable;
+        return Arrays::isIterable($obj);
     }
 }
 
@@ -323,44 +214,11 @@ if (!function_exists('array_take_off_recursive')) {
      */
     function array_take_off_recursive(&$array, $key, $default = null)
     {
-        $keys = explode('.', $key);
-
-        while (($currentKey = array_shift($keys)) !== null) {
-            if ($currentKey === '*') {
-                $values = array();
-
-                foreach ($array as $subKey => &$subArray) {
-                    if (empty($keys)) {
-                        $values[] = $subArray;
-                        unset($array[$subKey]);
-                    } else {
-                        $values[$subKey] = $subArray;
-                    }
-                }
-
-                return $values;
-            }
-
-            if (array_key_exists($currentKey, $array)) {
-                if (empty($keys)) {
-                    $target = $array[$currentKey];
-                    unset($array[$currentKey]);
-
-                    return $target;
-                } else {
-                    $array = &$array[$currentKey];
-                }
-            } else {
-                return $default;
-            }
-        }
-
-        return $default;
+        return Arrays::takeOffRecursive($array, $key, $default);
     }
 }
 
 if (!function_exists('array_merge_distinct_recursive')) {
-
     /**
      * @param array<int|string, mixed> ...$array
      *
@@ -368,33 +226,7 @@ if (!function_exists('array_merge_distinct_recursive')) {
      */
     function array_merge_distinct_recursive()
     {
-        $args = func_get_args();
-
-        $merged = current($args);
-
-        while (($current = current($args)) !== false) {
-            $stack = array(
-                array(&$merged, $current)
-            );
-
-            while (!empty($stack)) {
-                $item = array_pop($stack);
-                $target = &$item[0];
-                $source = $item[1];
-
-                foreach ($source as $key => $value) {
-                    if (is_array($value) && isset($target[$key]) && is_array($target[$key])) {
-                        $stack[] = array(&$target[$key], $value);
-                    } else {
-                        $target[$key] = $value;
-                    }
-                }
-            }
-
-            next($args);
-        }
-
-        return $merged;
+        return call_user_func_array(array(Arrays::class, 'mergeDistinctRecursive'), func_get_args());
     }
 }
 
@@ -438,11 +270,7 @@ if (!function_exists('str_starts_with')) {
      */
     function str_starts_with($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) === 0) return true;
-        }
-
-        return false;
+        return Strings::startsWith($haystack, $needles);
     }
 }
 
@@ -456,26 +284,20 @@ if (!function_exists('str_ends_with')) {
      */
     function str_ends_with($haystack, $needles)
     {
-        foreach ((array) $needles as $needle) {
-            if ((string) $needle === substr($haystack, -strlen($needle))) return true;
-        }
-
-        return false;
+        return Strings::endsWith($haystack, $needles);
     }
 }
 
 if (!function_exists('str_contains')) {
     /**
-     * based on original work from the PHP Laravel framework
-     * 
      * @param string $haystack
-     * @param string $needle
+     * @param array|string $needles
      * 
      * @return bool
      */
-    function str_contains($haystack, $needle)
+    function str_contains($haystack, $needles)
     {
-        return $needle === '' || mb_substr_count($haystack, $needle, (empty($encoding) ? mb_internal_encoding() : $encoding)) > 0;
+        return Strings::contains($haystack, $needles);
     }
 }
 
@@ -551,11 +373,7 @@ if (!function_exists("array_field")) {
      */
     function array_field($array, $keys)
     {
-        uksort($array, function ($a, $b) use ($keys) {
-            return array_search($a, $keys) <=> array_search($b, $keys);
-        });
-
-        return $array;
+        return Arrays::field($array, $keys);
     }
 }
 
@@ -572,32 +390,7 @@ if (!function_exists("array_set")) {
      */
     function array_set(&$array, $key, $value)
     {
-        if (is_null($key)) {
-            return $array = $value;
-        }
-
-        $keys = explode('.', $key);
-
-        foreach ($keys as $i => $key) {
-            if (count($keys) === 1) {
-                break;
-            }
-
-            unset($keys[$i]);
-
-            // If the key doesn't exist at this depth, we will just create an empty array
-            // to hold the next value, allowing us to create the arrays to hold final
-            // values at the correct depth. Then we'll keep digging into the array.
-            if (!isset($array[$key]) || !is_array($array[$key])) {
-                $array[$key] = array();
-            }
-
-            $array = &$array[$key];
-        }
-
-        $array[array_shift($keys)] = $value;
-
-        return $array;
+        return Arrays::set($array, $key, $value);
     }
 }
 
@@ -612,31 +405,7 @@ if (!function_exists("array_get")) {
      */
     function array_get($array, $key, $default = null)
     {
-        if (!is_accessible($array)) {
-            return value($default);
-        }
-
-        if (is_null($key)) {
-            return $array;
-        }
-
-        if (array_exists_key($array, $key)) {
-            return $array[$key];
-        }
-
-        if (!str_contains($key, '.')) {
-            return $array[$key] ?? value($default);
-        }
-
-        foreach (explode('.', $key) as $segment) {
-            if (is_accessible($array) && array_exists_key($array, $segment)) {
-                $array = $array[$segment];
-            } else {
-                return value($default);
-            }
-        }
-
-        return $array;
+        return Arrays::get($array, $key, $default);
     }
 }
 
@@ -649,7 +418,7 @@ if (!function_exists("is_accessible")) {
      */
     function is_accessible($value)
     {
-        return is_array($value) || $value instanceof ArrayAccess;
+        return Arrays::isAccessible($value);
     }
 }
 
@@ -672,21 +441,32 @@ if (!function_exists("array_exists_key")) {
 }
 
 if (!function_exists("str_delimiter_replace")) {
+    /**
+     * Determine if a given string ends with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  string|array  $delimiter
+     * @param  int  $case
+     * 
+     * @return string
+     */
     function str_delimiter_replace($value, $delimiter = '_', $case = MB_CASE_LOWER)
     {
-        if (!ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
-
-            $value = str_convert_case(preg_replace('/(.)(?=[A-Z])/u', '$1' . $delimiter, $value), $case);
-        }
-
-        return $value;
+        return Strings::delimiterReplace($value, $delimiter, $case);
     }
 }
 
 if (!function_exists("str_convert_case")) {
+    /**
+     * Determine if a given string ends with a given substring.
+     *
+     * @param  string  $haystack
+     * @param  int  $case
+     * 
+     * @return string
+     */
     function str_convert_case($value, $case = MB_CASE_LOWER)
     {
-        return mb_convert_case($value, $case, 'UTF-8');
+        return Strings::convertCase($value, $case);
     }
 }
