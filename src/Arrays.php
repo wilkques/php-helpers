@@ -83,7 +83,7 @@ class Arrays
 
     /**
      * @param array $array
-     * @param callable $callback
+     * @param callback|\Closure $callback
      * 
      * @return array
      */
@@ -171,7 +171,7 @@ class Arrays
     public static function get($array, $key, $default = null)
     {
         if (!static::isAccessible($array)) {
-            return value($default);
+            return static::value($default);
         }
 
         if (is_null($key)) {
@@ -182,15 +182,15 @@ class Arrays
             return $array[$key];
         }
 
-        if (!str_contains($key, '.')) {
-            return $array[$key] ?? value($default);
+        if (!Strings::contains($key, '.')) {
+            return $array[$key] ?? static::value($default);
         }
 
         foreach (explode('.', $key) as $segment) {
             if (static::isAccessible($array) && array_exists_key($array, $segment)) {
                 $array = $array[$segment];
             } else {
-                return value($default);
+                return static::value($default);
             }
         }
 
@@ -333,5 +333,21 @@ class Arrays
         });
 
         return $array;
+    }
+
+    /**
+     * Return the default value of the given value.
+     *
+     * @param  mixed  $value
+     * @param  mixed  ...$args
+     * @return mixed
+     */
+    public static function value()
+    {
+        $args = func_get_args();
+
+        $value = array_shift($args);
+
+        return $value instanceof \Closure ? call_user_func_array($value, $args) : $value;
     }
 }

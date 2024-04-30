@@ -24,7 +24,7 @@ class Objects
 
             if ($segments) {
                 foreach ($target as &$inner) {
-                    data_set($inner, $segments, $value, $overwrite);
+                    static::set($inner, $segments, $value, $overwrite);
                 }
             } elseif ($overwrite) {
                 foreach ($target as &$inner) {
@@ -33,12 +33,12 @@ class Objects
             }
         } elseif (Arrays::isAccessible($target)) {
             if ($segments) {
-                if (!exists($target, $segment)) {
+                if (!static::exists($target, $segment)) {
                     $target[$segment] = array();
                 }
 
-                data_set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite || !exists($target, $segment)) {
+                static::set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite || !static::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
         } elseif (is_object($target)) {
@@ -47,7 +47,7 @@ class Objects
                     $target->{$segment} = array();
                 }
 
-                data_set($target->{$segment}, $segments, $value, $overwrite);
+                static::set($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || !isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }
@@ -55,7 +55,7 @@ class Objects
             $target = array();
 
             if ($segments) {
-                data_set($target[$segment], $segments, $value, $overwrite);
+                static::set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
                 $target[$segment] = $value;
             }
@@ -89,13 +89,13 @@ class Objects
 
             if ($segment === '*') {
                 if (!Arrays::isIterable($target)) {
-                    return value($default);
+                    return static::value($default);
                 }
 
                 $result = array();
 
                 foreach ($target as $item) {
-                    $result[] = data_get($item, $key);
+                    $result[] = static::get($item, $key);
                 }
 
                 return $result;
@@ -106,10 +106,42 @@ class Objects
             } elseif (is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};
             } else {
-                return value($default);
+                return static::value($default);
             }
         }
 
         return $target;
+    }
+
+    /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int  $key
+     * @return bool
+     */
+    public static function exists($array, $key)
+    {
+        if ($array instanceof \ArrayAccess) {
+            return $array->offsetExists($key);
+        }
+
+        return array_key_exists($key, $array);
+    }
+
+    /**
+     * Return the default value of the given value.
+     *
+     * @param  mixed  $value
+     * @param  mixed  ...$args
+     * @return mixed
+     */
+    public static function value()
+    {
+        $args = func_get_args();
+
+        $value = array_shift($args);
+
+        return $value instanceof \Closure ? call_user_func_array($value, $args) : $value;
     }
 }

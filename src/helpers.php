@@ -196,11 +196,7 @@ if (!function_exists('value')) {
      */
     function value()
     {
-        $args = func_get_args();
-
-        $value = array_shift($args);
-
-        return $value instanceof \Closure ? call_user_func_array($value, $args) : $value;
+        return call_user_func_array(array(Arrays::class, 'value'), func_get_args());
     }
 }
 
