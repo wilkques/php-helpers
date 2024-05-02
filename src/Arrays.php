@@ -31,6 +31,17 @@ class Arrays
 
     /**
      * @param array $array
+     * @param callback|\Closure $callback
+     * 
+     * @return array
+     */
+    public static function map($array, $callback)
+    {
+        return array_map($callback, $array, array_keys($array));
+    }
+
+    /**
+     * @param array $array
      * @param string $value
      * @param string|null $key
      * @param int|null $case Either CASE_UPPER or CASE_LOWER or null
