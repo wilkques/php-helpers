@@ -50,7 +50,7 @@ class Arrays
      */
     public static function pluck(array $array, string $value, string $key = null, int $case = null)
     {
-        $results = [];
+        $results = array();
 
         if (count($array) > 0) {
             foreach ($array as $item) {
@@ -79,7 +79,7 @@ class Arrays
      */
     public static function mapWithKeys(array $array, callable $callback)
     {
-        $result = [];
+        $result = array();
 
         foreach ($array as $key => $value) {
             $assoc = $callback($value, $key);
@@ -100,7 +100,7 @@ class Arrays
      */
     public static function where(array $array, callable $callback)
     {
-        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        return Arrays::filter($array, $callback);
     }
 
     /**
@@ -360,5 +360,50 @@ class Arrays
         $value = array_shift($args);
 
         return $value instanceof \Closure ? call_user_func_array($value, $args) : $value;
+    }
+
+    /**
+     * Collapse an array of arrays into a single array.
+     *
+     * @param  iterable  $array
+     * @return array
+     */
+    public static function collapse($array)
+    {
+        $results = array();
+
+        foreach ($array as $values) {
+            if (! is_array($values)) {
+                continue;
+            }
+
+            $results[] = $values;
+        }
+
+        array_unshift($results, array());
+
+        return call_user_func_array('array_merge', $results);
+    }
+
+    /**
+     * @param array $array
+     * @param callback|\Closure $callback
+     * 
+     * @return mixed
+     */
+    public static function reduce($array, $callback)
+    {
+        return array_reduce($array, $callback);
+    }
+
+    /**
+     * @param array $array
+     * @param callback|\Closure $callback
+     * 
+     * @return mixed
+     */
+    public static function filter($array, $callback)
+    {
+        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
 }
