@@ -466,3 +466,66 @@ if (!function_exists("str_convert_case")) {
         return Strings::convertCase($value, $case);
     }
 }
+
+if (!function_exists("array_forget")) {
+    /**
+     * Get a subset of the items from the given array.
+     *
+     * @param  array  $array
+     * @param  array|string  ...$keys
+     * 
+     * @return void
+     */
+    function array_forget(&$array, $keys)
+    {
+        Arrays::forget($array, $keys);
+    }
+}
+
+if (!function_exists("array_key_kebab_case_to_camel")) {
+    /**
+     * @param  array  $array
+     * 
+     * @return array
+     */
+    function array_key_kebab_case_to_camel($array)
+    {
+        return Arrays::keyKebabCaseToCamel($array);
+    }
+}
+
+if (!function_exists("str_kebab_case_to_camel")) {
+    /**
+     * @param  string  $string
+     * 
+     * @return array
+     */
+    function str_kebab_case_to_camel($string)
+    {
+        return Strings::kebabCaseToCamel($string);
+    }
+}
+
+if (!function_exists("array_key_snake_to_camel")) {
+    /**
+     * @param  array  $array
+     * 
+     * @return array
+     */
+    function array_key_snake_to_camel($array)
+    {
+        return Arrays::keySnakeToCamel($array);
+    }
+}
+
+if (!function_exists("str_camel")) {
+    /**
+     * @param  string  $string
+     * 
+     * @return array
+     */
+    function str_snake_to_camel($string)
+    {
+        return Strings::snakeToCamel($string);
+    }
+}

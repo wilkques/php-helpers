@@ -107,4 +107,28 @@ class Strings
     {
         return mb_convert_case($value, $case, 'UTF-8');
     }
+
+    /**
+     * @param  string  $string
+     * 
+     * @return string
+     */
+    public static function kebabCaseToCamel($string)
+    {
+        return preg_replace_callback('/-(\w)/i', function ($match) {
+            return strtoupper($match[1]);
+        }, $string);
+    }
+
+    /**
+     * @param  string  $string
+     * 
+     * @return string
+     */
+    public static function snakeToCamel($string)
+    {
+        return preg_replace_callback('/_(\w)/i', function ($match) {
+            return strtoupper($match[1]);
+        }, $string);
+    }
 }
