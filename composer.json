@@ -5,7 +5,10 @@
     "autoload": {
         "files": [
             "src/helpers.php"
-        ]
+        ],
+        "psr-4": {
+            "Wilkques\\Helpers\\": "src/"
+        }
     },
     "require": {
         "php": ">=5.5"
