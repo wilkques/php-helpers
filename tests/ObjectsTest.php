@@ -4,7 +4,7 @@ namespace Wilkques\Helpers\Tests;
 
 use Wilkques\Helpers\Objects;
 
-class ObjectsTest extends Tests
+class ObjectsTest extends TestCase
 {
     public function testSet()
     {

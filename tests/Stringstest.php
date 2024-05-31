@@ -4,7 +4,7 @@ namespace Wilkques\Helpers\Tests;
 
 use Wilkques\Helpers\Strings;
 
-class StringsTest extends Tests
+class StringsTest extends TestCase
 {
     public function testContains()
     {

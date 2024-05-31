@@ -4,7 +4,7 @@ namespace Wilkques\Helpers\Tests;
 
 use Wilkques\Helpers\Arrays;
 
-class ArraysTest extends Tests
+class ArraysTest extends TestCase
 {
     public function testOnly()
     {
