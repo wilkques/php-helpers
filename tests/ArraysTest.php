@@ -739,7 +739,7 @@ class ArraysTest extends TestCase
             ),
             array(
                 123, 456
-            ),
+            )
         );
 
         $this->assertEquals(
