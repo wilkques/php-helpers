@@ -131,4 +131,16 @@ class Strings
             return strtoupper($match[1]);
         }, $string);
     }
+
+    /**
+     * @param  string  $string
+     * 
+     * @return string
+     */
+    public static function camel($string)
+    {
+        return preg_replace_callback('/[-_](\w)/i', function ($match) {
+            return strtoupper($match[1]);
+        }, $string);
+    }
 }

@@ -518,7 +518,7 @@ if (!function_exists("array_key_snake_to_camel")) {
     }
 }
 
-if (!function_exists("str_camel")) {
+if (!function_exists("str_snake_to_camel")) {
     /**
      * @param  string  $string
      * 
@@ -527,5 +527,19 @@ if (!function_exists("str_camel")) {
     function str_snake_to_camel($string)
     {
         return Strings::snakeToCamel($string);
+    }
+}
+
+if (!function_exists("str_camel")) {
+    /**
+     * replace snake & kebab case to camel
+     * 
+     * @param  string  $string
+     * 
+     * @return string
+     */
+    function str_camel($string)
+    {
+        return Strings::camel($string);
     }
 }
