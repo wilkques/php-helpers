@@ -27,7 +27,7 @@ class Arrays
     public static function keySnake($array)
     {
         return array_combine(
-            array_map(array(Strings::class, 'snake'), array_keys($array)), 
+            array_map(array(Strings::class, 'snake'), array_keys($array)),
             $array
         );
     }
@@ -364,7 +364,20 @@ class Arrays
     public static function fields($array, $sort)
     {
         uasort($array, function ($a, $b) use ($sort) {
-            return array_search($a, $sort) <=> array_search($b, $sort);
+            $indexA = array_search($a, $sort);
+
+            $indexB = array_search($b, $sort);
+
+            if ($indexA === false && $indexB === false) {
+                return 0; // 如果兩個元素都不在排序陣列中，則視為相等
+            } elseif ($indexA === false) {
+                return 1; // 如果 $a 不在排序陣列中，則視 $b 為更小的元素
+            } elseif ($indexB === false) {
+                return -1; // 如果 $b 不在排序陣列中，則視 $a 為更小的元素
+            }
+
+            // 如果兩個元素都在排序陣列中，則比較它們在排序陣列中的索引位置
+            return $indexA < $indexB ? -1 : ($indexA > $indexB ? 1 : 0);
         });
 
         return $array;
@@ -484,7 +497,7 @@ class Arrays
     public static function keyCamel($array)
     {
         return array_combine(
-            array_map(array(Strings::class, 'camel'), array_keys($array)), 
+            array_map(array(Strings::class, 'camel'), array_keys($array)),
             $array
         );
     }
