@@ -2,7 +2,7 @@
 
 namespace Wilkques\Helpers\Tests;
 
-use Tests\TestCase as BaseTestCase;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
 class TestCase extends BaseTestCase
 {
