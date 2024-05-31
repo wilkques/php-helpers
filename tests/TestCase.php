@@ -4,7 +4,7 @@ namespace Wilkques\Helpers\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
-class Tests extends OrchestraTestCase
+class TestCase extends OrchestraTestCase
 {
     /**
      * Asserts that a variable is of type int.
