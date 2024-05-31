@@ -27,7 +27,7 @@ class Arrays
     public static function keySnake($array)
     {
         return array_combine(
-            array_map(array(Strings::class, 'snake'), array_keys($array)),
+            array_map(array('Wilkques\Helpers\Strings', 'snake'), array_keys($array)),
             $array
         );
     }
@@ -497,7 +497,7 @@ class Arrays
     public static function keyCamel($array)
     {
         return array_combine(
-            array_map(array(Strings::class, 'camel'), array_keys($array)),
+            array_map(array('Wilkques\Helpers\Strings', 'camel'), array_keys($array)),
             $array
         );
     }

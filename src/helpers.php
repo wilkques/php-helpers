@@ -209,7 +209,7 @@ if (!function_exists('value')) {
      */
     function value()
     {
-        return call_user_func_array(array(Arrays::class, 'value'), func_get_args());
+        return call_user_func_array(array('Wilkques\Helpers\Arrays', 'value'), func_get_args());
     }
 }
 
@@ -235,7 +235,7 @@ if (!function_exists('array_merge_distinct_recursive')) {
      */
     function array_merge_distinct_recursive()
     {
-        return call_user_func_array(array(Arrays::class, 'mergeDistinctRecursive'), func_get_args());
+        return call_user_func_array(array('Wilkques\Helpers\Arrays', 'mergeDistinctRecursive'), func_get_args());
     }
 }
 
