@@ -14,7 +14,7 @@ class TestCase extends BaseTestCase
      *
      * @psalm-assert int $actual
      */
-    public static function assertIsInt($actual, string $message = ''): void
+    final public static function assertIsInt($actual, string $message = ''): void
     {
         if (PHP_MAJOR_VERSION >= 7) {
             parent::assertIsInt($actual, $message);
@@ -33,7 +33,7 @@ class TestCase extends BaseTestCase
      *
      * @psalm-assert string $actual
      */
-    public static function assertIsString($actual, string $message = ''): void
+    final public static function assertIsString($actual, string $message = ''): void
     {
         if (PHP_MAJOR_VERSION >= 7) {
             parent::assertIsString($actual, $message);
@@ -52,7 +52,7 @@ class TestCase extends BaseTestCase
      *
      * @psalm-assert array $actual
      */
-    public static function assertIsArray($actual, string $message = ''): void
+    final public static function assertIsArray($actual, string $message = ''): void
     {
         if (PHP_MAJOR_VERSION >= 7) {
             parent::assertIsArray($actual, $message);
