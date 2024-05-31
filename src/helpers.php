@@ -498,7 +498,7 @@ if (!function_exists("str_kebab_case_to_camel")) {
     /**
      * @param  string  $string
      * 
-     * @return array
+     * @return string
      */
     function str_kebab_case_to_camel($string)
     {
@@ -522,7 +522,7 @@ if (!function_exists("str_camel")) {
     /**
      * @param  string  $string
      * 
-     * @return array
+     * @return string
      */
     function str_snake_to_camel($string)
     {
