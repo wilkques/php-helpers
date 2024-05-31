@@ -541,7 +541,7 @@ class ArraysTest extends TestCase
 
         $value = Arrays::takeOffRecursive($array, 'efg');
 
-        $this->assertThat($value, $this->isType('int'));
+        $this->assertThat($value, $this->isType('array'));
 
         $this->assertEquals(
             $value,
