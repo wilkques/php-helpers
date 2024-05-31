@@ -522,7 +522,7 @@ class ArraysTest extends TestCase
 
         $value = Arrays::takeOffRecursive($array, 'abc.0');
 
-        $this->assertInternalType("int", $value);
+        $this->assertThat($value, $this->isType('int'));
 
         $this->assertEquals($value, 123);
 
@@ -541,7 +541,7 @@ class ArraysTest extends TestCase
 
         $value = Arrays::takeOffRecursive($array, 'efg');
 
-        $this->assertInternalType('array', $value);
+        $this->assertThat($value, $this->isType('int'));
 
         $this->assertEquals(
             $value,
@@ -752,20 +752,11 @@ class ArraysTest extends TestCase
 
     public function testValue()
     {
-        $this->assertInternalType(
-            'array',
-            Arrays::value(array())
-        );
+        $this->assertThat(Arrays::value(array()), $this->isType('array'));
 
-        $this->assertInternalType(
-            "int",
-            Arrays::value(1)
-        );
+        $this->assertThat(Arrays::value(1), $this->isType('int'));
 
-        $this->assertInternalType(
-            'string',
-            Arrays::value('')
-        );
+        $this->assertThat(Arrays::value(''), $this->isType('string'));
 
         $this->assertNull(
             Arrays::value(null)
@@ -776,47 +767,29 @@ class ArraysTest extends TestCase
             })
         );
 
-        $this->assertInternalType(
-            'array',
-            Arrays::value(function () {
-                return array();
-            })
-        );
+        $this->assertThat(Arrays::value(function () {
+            return array();
+        }), $this->isType('array'));
 
-        $this->assertInternalType(
-            "int",
-            Arrays::value(function () {
-                return 123;
-            })
-        );
+        $this->assertThat(Arrays::value(function () {
+            return 123;
+        }), $this->isType('int'));
 
-        $this->assertInternalType(
-            'string',
-            Arrays::value(function () {
-                return '';
-            })
-        );
+        $this->assertThat(Arrays::value(function () {
+            return '';
+        }), $this->isType('string'));
+        
+        $this->assertThat(Arrays::value(function ($array) {
+            return $array;
+        }, array()), $this->isType('array'));
 
-        $this->assertInternalType(
-            'array',
-            Arrays::value(function ($array) {
-                return $array;
-            }, array())
-        );
+        $this->assertThat(Arrays::value(function ($int) {
+            return $int;
+        }, 123), $this->isType('int'));
 
-        $this->assertInternalType(
-            "int",
-            Arrays::value(function ($int) {
-                return $int;
-            }, 123)
-        );
-
-        $this->assertInternalType(
-            'string',
-            Arrays::value(function ($string) {
-                return $string;
-            }, '')
-        );
+        $this->assertThat(Arrays::value(function ($string) {
+            return $string;
+        }, ''), $this->isType('string'));
     }
 
     public function testCollapse()

@@ -106,70 +106,43 @@ class ObjectsTest extends TestCase
 
     public function testValue()
     {
-        $this->assertInternalType(
-            'array',
-            Arrays::value(array())
-        );
+        $this->assertThat(Objects::value(array()), $this->isType('array'));
 
-        $this->assertInternalType(
-            "int",
-            Arrays::value(1)
-        );
+        $this->assertThat(Objects::value(1), $this->isType('int'));
 
-        $this->assertInternalType(
-            'string',
-            Arrays::value('')
+        $this->assertThat(Objects::value(''), $this->isType('string'));
+
+        $this->assertNull(
+            Objects::value(null)
         );
 
         $this->assertNull(
-            Arrays::value(null)
-        );
-
-        $this->assertNull(
-            Arrays::value(function () {
+            Objects::value(function () {
             })
         );
 
-        $this->assertInternalType(
-            'array',
-            Arrays::value(function () {
-                return array();
-            })
-        );
+        $this->assertThat(Objects::value(function () {
+            return array();
+        }), $this->isType('array'));
 
-        $this->assertInternalType(
-            "int",
-            Arrays::value(function () {
-                return 123;
-            })
-        );
+        $this->assertThat(Objects::value(function () {
+            return 123;
+        }), $this->isType('int'));
 
-        $this->assertInternalType(
-            'string',
-            Arrays::value(function () {
-                return '';
-            })
-        );
+        $this->assertThat(Objects::value(function () {
+            return '';
+        }), $this->isType('string'));
+        
+        $this->assertThat(Objects::value(function ($array) {
+            return $array;
+        }, array()), $this->isType('array'));
 
-        $this->assertInternalType(
-            'array',
-            Arrays::value(function ($array) {
-                return $array;
-            }, array())
-        );
+        $this->assertThat(Objects::value(function ($int) {
+            return $int;
+        }, 123), $this->isType('int'));
 
-        $this->assertInternalType(
-            "int",
-            Arrays::value(function ($int) {
-                return $int;
-            }, 123)
-        );
-
-        $this->assertInternalType(
-            'string',
-            Arrays::value(function ($string) {
-                return $string;
-            }, '')
-        );
+        $this->assertThat(Objects::value(function ($string) {
+            return $string;
+        }, ''), $this->isType('string'));
     }
 }
