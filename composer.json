@@ -10,6 +10,11 @@
             "Wilkques\\Helpers\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Wilkques\\Helpers\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "php": ">=5.5"
     },
