@@ -260,10 +260,10 @@ if (!function_exists('dir_scan')) {
 
                     if (is_dir($findPath)) {
                         $stack->push($findPath);
-                    } else if (version_compare(PHP_VERSION, '5.5', '<')) {
-                        return $findPath;
-                    } else {
+                    } else if (version_compare(PHP_VERSION, '5.5.0', '>=')) {
                         yield $findPath;
+                    } else {
+                        return $findPath;
                     }
                 }
             }
