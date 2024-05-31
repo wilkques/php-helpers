@@ -21,5 +21,10 @@
     "require-dev": {
         "phpunit/phpunit": "*",
         "orchestra/testbench": "*"
+    },
+    "config": {
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
     }
 }
