@@ -24,18 +24,21 @@ class Arrays
      * 
      * @return array
      */
-    public static function keySanke($array)
+    public static function keySnake($array)
     {
-        return array_combine(\Wilkques\Helpers\Strings::snake(array_keys($array)), $array);
+        return array_combine(
+            array_map(array(Strings::class, 'snake'), array_keys($array)), 
+            $array
+        );
     }
 
     /**
      * @param array $array
-     * @param callback|\Closure $callback
+     * @param callback|\Closure|null $callback
      * 
      * @return array
      */
-    public static function map($array, $callback)
+    public static function map($array, $callback = null)
     {
         return array_map($callback, $array, array_keys($array));
     }
@@ -44,11 +47,11 @@ class Arrays
      * @param array $array
      * @param string $value
      * @param string|null $key
-     * @param int|null $case Either CASE_UPPER or CASE_LOWER or null
+     * @param int|string|null $case Either upper|lower|snake|Kebab|camel|null
      * 
      * @return array
      */
-    public static function pluck(array $array, string $value, string $key = null, int $case = null)
+    public static function pluck($array, $value, $key = null, $case = null)
     {
         $results = array();
 
@@ -61,7 +64,27 @@ class Arrays
                 } else {
                     $itemKey = $item[$key];
 
-                    $itemKey = $case === CASE_LOWER ? strtolower($itemKey) : ($case === CASE_UPPER ? strtoupper($itemKey) : $itemKey);
+                    if (is_string($case)) {
+                        $case = Strings::lower($case);
+                    }
+
+                    switch ($case) {
+                        case 'lower':
+                            $itemKey = Strings::lower($itemKey);
+                            break;
+                        case 'upper':
+                            $itemKey = Strings::upper($itemKey);
+                            break;
+                        case 'snake':
+                            $itemKey = Strings::snake($itemKey);
+                            break;
+                        case 'kebab':
+                            $itemKey = Strings::Kebab($itemKey);
+                            break;
+                        case 'camel':
+                            $itemKey = Strings::camel($itemKey);
+                            break;
+                    }
 
                     $results[$itemKey] = $itemValue;
                 }
@@ -77,7 +100,7 @@ class Arrays
      * 
      * @return array
      */
-    public static function mapWithKeys(array $array, callable $callback)
+    public static function mapWithKeys($array, $callback)
     {
         $result = array();
 
@@ -98,26 +121,23 @@ class Arrays
      * 
      * @return array
      */
-    public static function where(array $array, callable $callback)
+    public static function where($array, $callback)
     {
         return Arrays::filter($array, $callback);
     }
 
     /**
+     * Get all of the given array except for a specified array of keys.
+     *
      * @param  array  $array
      * @param  array|string  $keys
-     * 
      * @return array
      */
     public static function except($array, $keys)
     {
-        if (!is_array($keys)) {
-            $keys = array(
-                $keys,
-            );
-        }
+        static::forget($array, $keys);
 
-        return array_diff_key($array, array_flip($keys));
+        return $array;
     }
 
     /**
@@ -128,7 +148,7 @@ class Arrays
      */
     public static function keyFields($array, $sort)
     {
-        return array_intersect_key(array_combine($sort, $array), $array);
+        return array_replace(array_flip($sort), $array);
     }
 
     /**
@@ -189,7 +209,7 @@ class Arrays
             return $array;
         }
 
-        if (array_exists_key($array, $key)) {
+        if (static::exists($array, $key)) {
             return $array[$key];
         }
 
@@ -198,7 +218,7 @@ class Arrays
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (static::isAccessible($array) && array_exists_key($array, $segment)) {
+            if (static::isAccessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
             } else {
                 return static::value($default);
@@ -333,14 +353,14 @@ class Arrays
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
-     * @param  array  $keys
+     * @param  array  $sort
      * 
      * @return array
      */
-    public static function field($array, $keys)
+    public static function fields($array, $sort)
     {
-        uksort($array, function ($a, $b) use ($keys) {
-            return array_search($a, $keys) <=> array_search($b, $keys);
+        uasort($array, function ($a, $b) use ($sort) {
+            return array_search($a, $sort) <=> array_search($b, $sort);
         });
 
         return $array;
@@ -373,7 +393,7 @@ class Arrays
         $results = array();
 
         foreach ($array as $values) {
-            if (! is_array($values)) {
+            if (!is_array($values)) {
                 continue;
             }
 
@@ -457,13 +477,22 @@ class Arrays
      * 
      * @return array
      */
+    public static function keyCamel($array)
+    {
+        return array_combine(
+            array_map(array(Strings::class, 'camel'), array_keys($array)), 
+            $array
+        );
+    }
+
+    /**
+     * @param array $array
+     * 
+     * @return array
+     */
     public static function keySnakeToCamel($array)
     {
-        $keys = array_map(function ($array) {
-            return Strings::snakeToCamel($array);
-        }, array_keys($array));
-
-        return array_combine($keys, $array);
+        return static::keyCamel($array);
     }
 
     /**
@@ -473,10 +502,6 @@ class Arrays
      */
     public static function keyKebabCaseToCamel($array)
     {
-        $keys = array_map(function ($array) {
-            return Strings::kebabCaseToCamel($array);
-        }, array_keys($array));
-
-        return array_combine($keys, $array);
+        return static::keyCamel($array);
     }
 }

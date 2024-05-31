@@ -28,19 +28,58 @@ class Strings
     }
 
     /**
-     * @param string $camelCase
+     * @param string $string
      * 
      * @return array|string|null
      */
-    public static function snake($camelCase)
+    public static function snake($string)
     {
-        return preg_replace_callback(
-            array("/([A-Z]+)/", "/_([A-Z]+)([A-Z][a-z])/"),
-            function ($matches) {
-                return "_" . lcfirst($matches[0]);
-            },
-            $camelCase
-        );
+        return static::delimiterReplace($string, '_');
+    }
+
+    /**
+     * Convert a string to kebab case.
+     *
+     * @param  string  $string
+     * @return string
+     */
+    public static function kebab($string)
+    {
+        return static::delimiterReplace($string, '-');
+    }
+
+    /**
+     * @param  string  $string
+     * 
+     * @return string
+     */
+    public static function camel($string)
+    {
+        return preg_replace_callback('/[-_](\w)/i', function ($match) {
+            return strtoupper($match[1]);
+        }, $string);
+    }
+
+    /**
+     * Convert the given string to lower-case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function lower($value)
+    {
+        return mb_strtolower($value, 'UTF-8');
+    }
+
+    /**
+     * Convert the given string to lower-case.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function upper($value)
+    {
+        return mb_strtoupper($value, 'UTF-8');
     }
 
     /**
@@ -79,20 +118,19 @@ class Strings
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
-     * @param  string|array  $delimiter
-     * @param  int  $case
+     * @param  string  $delimiter
      * 
      * @return string
      */
-    public static function delimiterReplace($value, $delimiter = '_', $case = MB_CASE_LOWER)
+    public static function delimiterReplace($haystack, $delimiter = '_')
     {
-        if (!ctype_lower($value)) {
-            $value = preg_replace('/\s+/u', '', ucwords($value));
+        $string = preg_replace('/\s+/u', '', ucwords($haystack));
 
-            $value = str_convert_case(preg_replace('/(.)(?=[A-Z])/u', '$1' . $delimiter, $value), $case);
-        }
-
-        return $value;
+        return static::lower(
+            preg_replace_callback('/(.)(?=[A-Z])/u', function ($match) use ($delimiter) {
+                return $match[0] . $delimiter;
+            }, $string)
+        );
     }
 
     /**
@@ -128,18 +166,6 @@ class Strings
     public static function snakeToCamel($string)
     {
         return preg_replace_callback('/_(\w)/i', function ($match) {
-            return strtoupper($match[1]);
-        }, $string);
-    }
-
-    /**
-     * @param  string  $string
-     * 
-     * @return string
-     */
-    public static function camel($string)
-    {
-        return preg_replace_callback('/[-_](\w)/i', function ($match) {
             return strtoupper($match[1]);
         }, $string);
     }

@@ -26,7 +26,7 @@ if (!function_exists('array_key_sanke')) {
      */
     function array_key_sanke($array)
     {
-        return Arrays::keySanke($array);
+        return Arrays::keySnake($array);
     }
 }
 
@@ -124,6 +124,19 @@ if (!function_exists("array_key_fields")) {
     function array_key_fields($array, $sort)
     {
         return Arrays::keyFields($array, $sort);
+    }
+}
+
+if (!function_exists("array_fields")) {
+    /**
+     * @param array $array
+     * @param array $sort
+     * 
+     * @return array
+     */
+    function array_fields($array, $sort)
+    {
+        return Arrays::fields($array, $sort);
     }
 }
 
@@ -369,7 +382,7 @@ if (!function_exists("array_field")) {
      */
     function array_field($array, $keys)
     {
-        return Arrays::field($array, $keys);
+        return Arrays::fields($array, $keys);
     }
 }
 
@@ -418,37 +431,18 @@ if (!function_exists("is_accessible")) {
     }
 }
 
-if (!function_exists("array_exists_key")) {
-    /**
-     * Determine if the given key exists in the provided array.
-     *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int  $key
-     * @return bool
-     */
-    function array_exists_key($array, $key)
-    {
-        if ($array instanceof ArrayAccess) {
-            return $array->offsetExists($key);
-        }
-
-        return array_key_exists($key, $array);
-    }
-}
-
 if (!function_exists("str_delimiter_replace")) {
     /**
      * Determine if a given string ends with a given substring.
      *
      * @param  string  $haystack
      * @param  string|array  $delimiter
-     * @param  int  $case
      * 
      * @return string
      */
-    function str_delimiter_replace($value, $delimiter = '_', $case = MB_CASE_LOWER)
+    function str_delimiter_replace($value, $delimiter = '_')
     {
-        return Strings::delimiterReplace($value, $delimiter, $case);
+        return Strings::delimiterReplace($value, $delimiter);
     }
 }
 
