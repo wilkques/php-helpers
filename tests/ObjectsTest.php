@@ -2,6 +2,7 @@
 
 namespace Wilkques\Helpers\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Wilkques\Helpers\Objects;
 
 class ObjectsTest extends TestCase
@@ -105,59 +106,68 @@ class ObjectsTest extends TestCase
 
     public function testValue()
     {
-        $this->assertIsArray(
-            Objects::value(array())
+        $this->assertInternalType(
+            'array',
+            Arrays::value(array())
         );
 
-        $this->assertIsInt(
-            Objects::value(1)
+        $this->assertInternalType(
+            "int",
+            Arrays::value(1)
         );
 
-        $this->assertIsString(
-            Objects::value('')
+        $this->assertInternalType(
+            'string',
+            Arrays::value('')
         );
 
         $this->assertNull(
-            Objects::value(null)
+            Arrays::value(null)
         );
 
         $this->assertNull(
-            Objects::value(function () {
+            Arrays::value(function () {
             })
         );
 
-        $this->assertIsArray(
-            Objects::value(function () {
+        $this->assertInternalType(
+            'array',
+            Arrays::value(function () {
                 return array();
             })
         );
 
-        $this->assertIsInt(
-            Objects::value(function () {
+        $this->assertInternalType(
+            "int",
+            Arrays::value(function () {
                 return 123;
             })
         );
 
-        $this->assertIsString(
-            Objects::value(function () {
+        $this->assertInternalType(
+            'string',
+            Arrays::value(function () {
                 return '';
             })
         );
 
-        $this->assertIsArray(
-            Objects::value(function ($array) {
+        $this->assertInternalType(
+            'array',
+            Arrays::value(function ($array) {
                 return $array;
             }, array())
         );
 
-        $this->assertIsInt(
-            Objects::value(function ($int) {
+        $this->assertInternalType(
+            "int",
+            Arrays::value(function ($int) {
                 return $int;
             }, 123)
         );
 
-        $this->assertIsString(
-            Objects::value(function ($string) {
+        $this->assertInternalType(
+            'string',
+            Arrays::value(function ($string) {
                 return $string;
             }, '')
         );

@@ -2,6 +2,7 @@
 
 namespace Wilkques\Helpers\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Wilkques\Helpers\Strings;
 
 class StringsTest extends TestCase

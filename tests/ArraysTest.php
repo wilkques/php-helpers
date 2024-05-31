@@ -2,6 +2,7 @@
 
 namespace Wilkques\Helpers\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Wilkques\Helpers\Arrays;
 
 class ArraysTest extends TestCase
@@ -521,7 +522,7 @@ class ArraysTest extends TestCase
 
         $value = Arrays::takeOffRecursive($array, 'abc.0');
 
-        $this->assertIsInt($value);
+        $this->assertInternalType("int", $value);
 
         $this->assertEquals($value, 123);
 
@@ -540,7 +541,7 @@ class ArraysTest extends TestCase
 
         $value = Arrays::takeOffRecursive($array, 'efg');
 
-        $this->assertIsArray($value);
+        $this->assertInternalType('array', $value);
 
         $this->assertEquals(
             $value,
@@ -751,15 +752,18 @@ class ArraysTest extends TestCase
 
     public function testValue()
     {
-        $this->assertIsArray(
+        $this->assertInternalType(
+            'array',
             Arrays::value(array())
         );
 
-        $this->assertIsInt(
+        $this->assertInternalType(
+            "int",
             Arrays::value(1)
         );
 
-        $this->assertIsString(
+        $this->assertInternalType(
+            'string',
             Arrays::value('')
         );
 
@@ -772,37 +776,43 @@ class ArraysTest extends TestCase
             })
         );
 
-        $this->assertIsArray(
+        $this->assertInternalType(
+            'array',
             Arrays::value(function () {
                 return array();
             })
         );
 
-        $this->assertIsInt(
+        $this->assertInternalType(
+            "int",
             Arrays::value(function () {
                 return 123;
             })
         );
 
-        $this->assertIsString(
+        $this->assertInternalType(
+            'string',
             Arrays::value(function () {
                 return '';
             })
         );
 
-        $this->assertIsArray(
+        $this->assertInternalType(
+            'array',
             Arrays::value(function ($array) {
                 return $array;
             }, array())
         );
 
-        $this->assertIsInt(
+        $this->assertInternalType(
+            "int",
             Arrays::value(function ($int) {
                 return $int;
             }, 123)
         );
 
-        $this->assertIsString(
+        $this->assertInternalType(
+            'string',
             Arrays::value(function ($string) {
                 return $string;
             }, '')
