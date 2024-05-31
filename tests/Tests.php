@@ -2,9 +2,9 @@
 
 namespace Wilkques\Helpers\Tests;
 
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
-class Tests extends TestCase
+class Tests extends OrchestraTestCase
 {
     /**
      * Asserts that a variable is of type int.
