@@ -214,7 +214,11 @@ class Arrays
         }
 
         if (!Strings::contains($key, '.')) {
-            return $array[$key] ?? static::value($default);
+            if (static::exists($array, $key)) {
+                return static::get($array, $key);
+            }
+
+            return  static::value($default);
         }
 
         foreach (explode('.', $key) as $segment) {
