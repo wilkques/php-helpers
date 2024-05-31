@@ -14,7 +14,7 @@ class ArraysTest extends TestCase
                 'abc' => 123,
                 'efg' => 456
             ),
-            'abc',
+            'abc'
         );
 
         $this->assertArrayHasKey('abc', $array);
@@ -52,7 +52,7 @@ class ArraysTest extends TestCase
             array(
                 'abcEfg' => 123,
                 'hijKlm' => 456
-            ),
+            )
         );
 
         $this->assertArrayHasKey('abc_efg', $array);
@@ -262,7 +262,7 @@ class ArraysTest extends TestCase
                 'abc' => 123,
                 'efg' => 456
             ),
-            'abc',
+            'abc'
         );
 
         $this->assertArrayHasKey('efg', $array);
@@ -303,7 +303,7 @@ class ArraysTest extends TestCase
             ),
             array(
                 'abc', 'efg'
-            ),
+            )
         );
 
         $this->assertEquals(
@@ -876,7 +876,7 @@ class ArraysTest extends TestCase
 
         Arrays::forget(
             $array,
-            'abc',
+            'abc'
         );
 
         $this->assertArrayHasKey('efg', $array);
