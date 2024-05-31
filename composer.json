@@ -19,12 +19,6 @@
         "php": ">=5.5"
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
-        "orchestra/testbench": "*"
-    },
-    "config": {
-        "allow-plugins": {
-            "kylekatarnls/update-helper": true
-        }
+        "phpunit/phpunit": "*"
     }
 }
