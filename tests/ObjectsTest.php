@@ -2,10 +2,9 @@
 
 namespace Wilkques\Helpers\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Wilkques\Helpers\Objects;
 
-class ObjectsTest extends TestCase
+class ObjectsTest extends Tests
 {
     public function testSet()
     {

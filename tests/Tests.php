@@ -4,7 +4,7 @@ namespace Wilkques\Helpers\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-class ArraysTest extends TestCase
+class Tests extends TestCase
 {
     /**
      * Asserts that a variable is of type int.

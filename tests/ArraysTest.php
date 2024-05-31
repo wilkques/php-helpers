@@ -2,10 +2,9 @@
 
 namespace Wilkques\Helpers\Tests;
 
-use PHPUnit\Framework\TestCase;
 use Wilkques\Helpers\Arrays;
 
-class ArraysTest extends TestCase
+class ArraysTest extends Tests
 {
     public function testOnly()
     {
