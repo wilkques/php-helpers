@@ -4,7 +4,7 @@ use Wilkques\Helpers\Arrays;
 use Wilkques\Helpers\Objects;
 use Wilkques\Helpers\Strings;
 
-if (!function_exists('string_snake')) {
+if (!function_exists('str_snake')) {
     /**
      * @param string $camelCase
      * 
