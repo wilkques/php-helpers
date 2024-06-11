@@ -200,6 +200,77 @@ class ArraysTest extends TestCase
                 'fghIjk' => 'zabCde',
             )
         );
+
+        $default = array(
+            array(
+                'abcEfg' => array(
+                    'hijKlm' => 'fghijk',
+                ),
+                'nopQrs' => array(
+                    'tuvWxy' => 'lmnopq',
+                ),
+            ),
+            array(
+                'abcEfg' => array(
+                    'hijKlm' => 'zabCde',
+                ),
+                'nopQrs' => array(
+                    'tuvWxy' => 'rstuvw',
+                ),
+            ),
+        );
+
+        $array = Arrays::pluck(
+            $default,
+            'abcEfg.hijKlm'
+        );
+
+        $this->assertEquals(
+            $array,
+            array(
+                'fghijk', 'zabCde'
+            )
+        );
+
+        $array = Arrays::pluck(
+            $default,
+            'abcEfg.hijKlm',
+            'nopQrs.tuvWxy'
+        );
+
+        $this->assertEquals(
+            $array,
+            array(
+                'lmnopq' => 'fghijk', 
+                'rstuvw' => 'zabCde'
+            )
+        );
+
+        $array = Arrays::pluck(
+            $default,
+            'nopQrs.tuvWxy'
+        );
+
+        $this->assertEquals(
+            $array,
+            array(
+                'lmnopq', 'rstuvw'
+            )
+        );
+
+        $array = Arrays::pluck(
+            $default,
+            'nopQrs.tuvWxy',
+            'abcEfg.hijKlm',
+        );
+
+        $this->assertEquals(
+            $array,
+            array(
+                'fghijk' => 'lmnopq', 
+                'zabCde' => 'rstuvw'
+            )
+        );
     }
 
     public function testMapWithKeys()

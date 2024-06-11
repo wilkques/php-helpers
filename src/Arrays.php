@@ -55,39 +55,44 @@ class Arrays
     {
         $results = array();
 
-        if (count($array) > 0) {
-            foreach ($array as $item) {
-                $itemValue = $item[$value];
+        $value = is_string($value) ? explode('.', $value) : $value;
 
-                if (is_null($key)) {
-                    $results[] = $itemValue;
-                } else {
-                    $itemKey = $item[$key];
+        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
 
-                    if (is_string($case)) {
-                        $case = Strings::lower($case);
-                    }
+        foreach ($array as $item) {
+            $itemValue = data_get($item, $value);
 
-                    switch ($case) {
-                        case 'lower':
-                            $itemKey = Strings::lower($itemKey);
-                            break;
-                        case 'upper':
-                            $itemKey = Strings::upper($itemKey);
-                            break;
-                        case 'snake':
-                            $itemKey = Strings::snake($itemKey);
-                            break;
-                        case 'kebab':
-                            $itemKey = Strings::Kebab($itemKey);
-                            break;
-                        case 'camel':
-                            $itemKey = Strings::camel($itemKey);
-                            break;
-                    }
+            // If the key is "null", we will just append the value to the array and keep
+            // looping. Otherwise we will key the array using the value of the key we
+            // received from the developer. Then we'll return the final array form.
+            if (is_null($key)) {
+                $results[] = $itemValue;
+            } else {
+                $itemKey = data_get($item, $key);
 
-                    $results[$itemKey] = $itemValue;
+                if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
+                    $itemKey = (string) $itemKey;
                 }
+
+                switch ($case) {
+                    case 'lower':
+                        $itemKey = Strings::lower($itemKey);
+                        break;
+                    case 'upper':
+                        $itemKey = Strings::upper($itemKey);
+                        break;
+                    case 'snake':
+                        $itemKey = Strings::snake($itemKey);
+                        break;
+                    case 'kebab':
+                        $itemKey = Strings::Kebab($itemKey);
+                        break;
+                    case 'camel':
+                        $itemKey = Strings::camel($itemKey);
+                        break;
+                }
+
+                $results[$itemKey] = $itemValue;
             }
         }
 
