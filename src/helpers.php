@@ -32,14 +32,14 @@ if (!function_exists('array_key_sanke')) {
 
 if (!function_exists('array_pluck')) {
     /**
-     * @param array $array
+     * @param array|object $array
      * @param string $value
      * @param string|null $key
      * @param int|null $case Either CASE_UPPER or CASE_LOWER or null
      * 
      * @return array
      */
-    function array_pluck(array $array, string $value, string $key = null, int $case = null)
+    function array_pluck($array, string $value, string $key = null, int $case = null)
     {
        return Arrays::pluck($array, $value, $key, $case);
     }
@@ -52,7 +52,7 @@ if (!function_exists('array_map_with_keys')) {
      * 
      * @return array
      */
-    function array_map_with_keys(array $array, callable $callback)
+    function array_map_with_keys($array, callable $callback)
     {
         return Arrays::mapWithKeys($array, $callback);
     }
@@ -65,7 +65,7 @@ if (!function_exists('array_where')) {
      * 
      * @return array
      */
-    function array_where(array $array, callable $callback)
+    function array_where($array, callable $callback)
     {
         return Arrays::where($array, $callback);
     }
@@ -78,7 +78,7 @@ if (!function_exists('data_where')) {
      * 
      * @return array
      */
-    function data_where(array $array, callable $callback)
+    function data_where($array, callable $callback)
     {
         return Arrays::where($array, $callback);
     }
