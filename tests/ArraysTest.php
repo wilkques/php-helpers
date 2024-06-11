@@ -261,7 +261,7 @@ class ArraysTest extends TestCase
         $array = Arrays::pluck(
             $default,
             'nopQrs.tuvWxy',
-            'abcEfg.hijKlm',
+            'abcEfg.hijKlm'
         );
 
         $this->assertEquals(
