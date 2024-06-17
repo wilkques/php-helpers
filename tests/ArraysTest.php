@@ -1122,7 +1122,7 @@ class ArraysTest extends TestCase
             array(
                 'abcEfg' => 123,
                 'hijKlm' => 456,
-            ),
+            )
         );
 
         $this->assertEquals(
@@ -1132,7 +1132,7 @@ class ArraysTest extends TestCase
                     'hijKlm' => 456,
                 ),
             ),
-            123,
+            123
         );
 
         $this->assertEquals(
@@ -1175,7 +1175,7 @@ class ArraysTest extends TestCase
             array(
                 'abcEfg' => 456,
                 'hijKlm' => 123,
-            ),
+            )
         );
 
         $this->assertEquals(
@@ -1185,7 +1185,7 @@ class ArraysTest extends TestCase
                     'hijKlm' => 456,
                 ),
             ),
-            456,
+            456
         );
 
         $this->assertEquals(
@@ -1228,7 +1228,7 @@ class ArraysTest extends TestCase
                     123,
                     456,
                 ),
-            ),
+            )
         );
     }
 
@@ -1244,7 +1244,7 @@ class ArraysTest extends TestCase
             ),
             array(
                 'abcEfg.hijKlm' => 123
-            ),
+            )
         );
     }
 
@@ -1260,7 +1260,7 @@ class ArraysTest extends TestCase
                 'abcEfg' => array(
                     'hijKlm' => 123,
                 ),
-            ),
+            )
         );
     }
 
