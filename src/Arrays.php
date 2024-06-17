@@ -622,10 +622,10 @@ class Arrays
         $results = [];
 
         foreach ($array as $key => $value) {
-            if (is_array($value) && ! empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
+            if (is_array($value) && !empty($value)) {
+                $results = array_merge($results, static::dot($value, $prepend . $key . '.'));
             } else {
-                $results[$prepend.$key] = $value;
+                $results[$prepend . $key] = $value;
             }
         }
 
@@ -660,7 +660,7 @@ class Arrays
     {
         $keys = (array) $keys;
 
-        if (! $array || $keys === []) {
+        if (!$array || $keys === []) {
             return false;
         }
 
@@ -695,7 +695,7 @@ class Arrays
         $result = [];
 
         foreach ($array as $item) {
-            if (! is_array($item)) {
+            if (!is_array($item)) {
                 $result[] = $item;
             } else {
                 $values = $depth === 1

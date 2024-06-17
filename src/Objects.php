@@ -18,7 +18,7 @@ class Objects
         $segments = is_array($key) ? $key : explode('.', $key);
 
         if (($segment = array_shift($segments)) === '*') {
-            if (!Arrays::isAccessible($target)) {
+            if (!static::accessible($target)) {
                 $target = array();
             }
 
@@ -31,7 +31,7 @@ class Objects
                     $inner = $value;
                 }
             }
-        } elseif (Arrays::isAccessible($target)) {
+        } elseif (static::accessible($target)) {
             if ($segments) {
                 if (!static::exists($target, $segment)) {
                     $target[$segment] = array();
@@ -143,5 +143,16 @@ class Objects
         $value = array_shift($args);
 
         return $value instanceof \Closure ? call_user_func_array($value, $args) : $value;
+    }
+
+    /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function accessible($value)
+    {
+        return is_array($value) || $value instanceof \ArrayAccess;
     }
 }
