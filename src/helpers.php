@@ -418,16 +418,16 @@ if (!function_exists("array_get")) {
     }
 }
 
-if (!function_exists("is_accessible")) {
+if (!function_exists("accessible")) {
     /**
      * Determine whether the given value is array accessible.
      *
      * @param  mixed  $value
      * @return bool
      */
-    function is_accessible($value)
+    function accessible($value)
     {
-        return Arrays::isAccessible($value);
+        return Arrays::accessible($value);
     }
 }
 

@@ -241,7 +241,7 @@ class ArraysTest extends TestCase
         $this->assertEquals(
             $array,
             array(
-                'lmnopq' => 'fghijk', 
+                'lmnopq' => 'fghijk',
                 'rstuvw' => 'zabCde'
             )
         );
@@ -267,7 +267,7 @@ class ArraysTest extends TestCase
         $this->assertEquals(
             $array,
             array(
-                'fghijk' => 'lmnopq', 
+                'fghijk' => 'lmnopq',
                 'zabCde' => 'rstuvw'
             )
         );
@@ -434,51 +434,51 @@ class ArraysTest extends TestCase
         $this->assertEquals($value, null);
     }
 
-    public function testIsAccessible()
+    public function testAccessible()
     {
         $this->assertTrue(
-            Arrays::isAccessible(array())
+            Arrays::accessible(array())
         );
 
         $this->assertTrue(
-            Arrays::isAccessible(new \ArrayIterator())
+            Arrays::accessible(new \ArrayIterator())
         );
 
         $this->assertTrue(
-            Arrays::isAccessible($this->createMock(\ArrayAccess::class))
+            Arrays::accessible($this->createMock(\ArrayAccess::class))
         );
 
         $this->assertFalse(
-            Arrays::isAccessible($this->createMock(\Traversable::class))
+            Arrays::accessible($this->createMock(\Traversable::class))
         );
 
         $this->assertFalse(
-            Arrays::isAccessible(1)
+            Arrays::accessible(1)
         );
 
         $this->assertFalse(
-            Arrays::isAccessible('1')
+            Arrays::accessible('1')
         );
 
         $this->assertFalse(
-            Arrays::isAccessible('string')
+            Arrays::accessible('string')
         );
 
         $this->assertFalse(
-            Arrays::isAccessible(null)
+            Arrays::accessible(null)
         );
 
         $this->assertFalse(
-            Arrays::isAccessible(true)
+            Arrays::accessible(true)
         );
 
         $this->assertFalse(
-            Arrays::isAccessible(function () {
+            Arrays::accessible(function () {
             })
         );
 
         $this->assertFalse(
-            Arrays::isAccessible(new \stdClass)
+            Arrays::accessible(new \stdClass)
         );
     }
 
@@ -849,7 +849,7 @@ class ArraysTest extends TestCase
         $this->assertThat(Arrays::value(function () {
             return '';
         }), $this->isType('string'));
-        
+
         $this->assertThat(Arrays::value(function ($array) {
             return $array;
         }, array()), $this->isType('array'));
@@ -1006,6 +1006,367 @@ class ArraysTest extends TestCase
                 'abcEfg' => 123,
                 'hijKlm' => 456,
             )
+        );
+    }
+
+    public function testReplace()
+    {
+        $this->assertEquals(
+            Arrays::replace(
+                array(
+                    'abcEfg' => 123,
+                    'hijKlm' => 456,
+                ),
+                array(
+                    'abcEfg' => 456,
+                    'hijKlm' => 123,
+                )
+            ),
+            array(
+                'abcEfg' => 456,
+                'hijKlm' => 123,
+            )
+        );
+
+        $this->assertEquals(
+            Arrays::replace(
+                array(
+                    'abcEfg' => 123,
+                    'hijKlm' => 456,
+                    'nopQrs' => array(
+                        'tuvWxy' => 789,
+                        'zabcde' => 123,
+                    ),
+                ),
+                array(
+                    'abcEfg' => 456,
+                    'hijKlm' => 123,
+                    'nopQrs' => array(
+                        'zabcde' => 789,
+                    ),
+                )
+            ),
+            array(
+                'abcEfg' => 456,
+                'hijKlm' => 123,
+                'nopQrs' => array(
+                    'zabcde' => 789,
+                ),
+            )
+        );
+    }
+
+    public function testReplaceRecursive()
+    {
+        $this->assertEquals(
+            Arrays::replaceRecursive(
+                array(
+                    'abcEfg' => 123,
+                    'hijKlm' => 456,
+                ),
+                array(
+                    'abcEfg' => 456,
+                    'hijKlm' => 123,
+                )
+            ),
+            array(
+                'abcEfg' => 456,
+                'hijKlm' => 123,
+            )
+        );
+
+        $this->assertEquals(
+            Arrays::replaceRecursive(
+                array(
+                    'abcEfg' => 123,
+                    'hijKlm' => 456,
+                    'nopQrs' => array(
+                        'tuvWxy' => 789,
+                        'zabcde' => 123,
+                    ),
+                ),
+                array(
+                    'abcEfg' => 456,
+                    'hijKlm' => 123,
+                    'nopQrs' => array(
+                        'zabcde' => 789,
+                    ),
+                )
+            ),
+            array(
+                'abcEfg' => 456,
+                'hijKlm' => 123,
+                'nopQrs' => array(
+                    'tuvWxy' => 789,
+                    'zabcde' => 789,
+                ),
+            )
+        );
+    }
+
+    public function testFirst()
+    {
+        $this->assertEquals(
+            Arrays::first(
+                array(
+                    array(
+                        'abcEfg' => 123,
+                        'hijKlm' => 456,
+                    ),
+                    array(
+                        'abcEfg' => 456,
+                        'hijKlm' => 123,
+                    ),
+                ),
+            ),
+            array(
+                'abcEfg' => 123,
+                'hijKlm' => 456,
+            ),
+        );
+
+        $this->assertEquals(
+            Arrays::first(
+                array(
+                    'abcEfg' => 123,
+                    'hijKlm' => 456,
+                ),
+            ),
+            123,
+        );
+
+        $this->assertEquals(
+            Arrays::first(
+                array(1, 2, 3, 4, 5, 6),
+                function ($value) {
+                    return $value > 4;
+                }
+            ),
+            5
+        );
+
+        $this->assertEquals(
+            Arrays::first(
+                array(1, 2, 3, 4, 5, 6),
+                function ($value) {
+                    return $value > 6;
+                },
+                7
+            ),
+            7
+        );
+    }
+
+    public function testLast()
+    {
+        $this->assertEquals(
+            Arrays::last(
+                array(
+                    array(
+                        'abcEfg' => 123,
+                        'hijKlm' => 456,
+                    ),
+                    array(
+                        'abcEfg' => 456,
+                        'hijKlm' => 123,
+                    ),
+                ),
+            ),
+            array(
+                'abcEfg' => 456,
+                'hijKlm' => 123,
+            ),
+        );
+
+        $this->assertEquals(
+            Arrays::last(
+                array(
+                    'abcEfg' => 123,
+                    'hijKlm' => 456,
+                ),
+            ),
+            456,
+        );
+
+        $this->assertEquals(
+            Arrays::last(
+                array(1, 2, 3, 4, 5, 6),
+                function ($value) {
+                    return $value > 4;
+                }
+            ),
+            6
+        );
+
+        $this->assertEquals(
+            Arrays::last(
+                array(1, 2, 3, 4, 5, 6),
+                function ($value) {
+                    return $value > 6;
+                },
+                7
+            ),
+            7
+        );
+    }
+
+    public function testDivide()
+    {
+        $this->assertEquals(
+            Arrays::divide(
+                array(
+                    'abcEfg' => 123,
+                    'hijKlm' => 456,
+                ),
+            ),
+            array(
+                array(
+                    'abcEfg',
+                    'hijKlm',
+                ),
+                array(
+                    123,
+                    456,
+                ),
+            ),
+        );
+    }
+
+    public function testDot()
+    {
+        $this->assertEquals(
+            Arrays::dot(
+                array(
+                    'abcEfg' => array(
+                        'hijKlm' => 123,
+                    ),
+                ),
+            ),
+            array(
+                'abcEfg.hijKlm' => 123
+            ),
+        );
+    }
+
+    public function testUndot()
+    {
+        $this->assertEquals(
+            Arrays::undot(
+                array(
+                    'abcEfg.hijKlm' => 123
+                ),
+            ),
+            array(
+                'abcEfg' => array(
+                    'hijKlm' => 123,
+                ),
+            ),
+        );
+    }
+
+    public function testHas()
+    {
+        $this->assertTrue(
+            Arrays::has(
+                array(
+                    'abcEfg' => 123,
+                ),
+                'abcEfg'
+            )
+        );
+    }
+
+    public function testFlatten()
+    {
+        $this->assertEquals(
+            Arrays::flatten(
+                array(
+                    'abcEfg' => 123,
+                    array(
+                        'abcEfg' => 456,
+                        'hijKlm' => 123,
+                    ),
+                )
+            ),
+            array(123, 456, 123)
+        );
+    }
+
+    public function testPrepend()
+    {
+        $this->assertEquals(
+            Arrays::prepend(
+                array(
+                    'abcEfg' => 123,
+                    array(
+                        'abcEfg' => 456,
+                        'hijKlm' => 123,
+                    ),
+                ),
+                456,
+                'hijKlm'
+            ),
+            array(
+                'hijKlm' => 456,
+                'abcEfg' => 123,
+                array(
+                    'abcEfg' => 456,
+                    'hijKlm' => 123,
+                ),
+            )
+        );
+    }
+
+    public function testPull()
+    {
+        $array = array(
+            'abcEfg' => 123,
+            array(
+                'abcEfg' => 456,
+                'hijKlm' => 123,
+            ),
+        );
+
+        $this->assertEquals(
+            Arrays::pull(
+                $array,
+                'abcEfg'
+            ),
+            123
+        );
+
+        $this->assertEquals(
+            $array,
+            array(
+                array(
+                    'abcEfg' => 456,
+                    'hijKlm' => 123,
+                )
+            )
+        );
+    }
+
+    public function testWrap()
+    {
+        $this->assertEquals(
+            Arrays::wrap(
+                123
+            ),
+            array(123)
+        );
+
+        $this->assertEquals(
+            Arrays::wrap(
+                array(123)
+            ),
+            array(123)
+        );
+
+        $this->assertEquals(
+            Arrays::wrap(
+                null
+            ),
+            array()
         );
     }
 }
