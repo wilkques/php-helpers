@@ -1117,7 +1117,7 @@ class ArraysTest extends TestCase
                         'abcEfg' => 456,
                         'hijKlm' => 123,
                     ),
-                ),
+                )
             ),
             array(
                 'abcEfg' => 123,
@@ -1130,7 +1130,7 @@ class ArraysTest extends TestCase
                 array(
                     'abcEfg' => 123,
                     'hijKlm' => 456,
-                ),
+                )
             ),
             123
         );
@@ -1170,7 +1170,7 @@ class ArraysTest extends TestCase
                         'abcEfg' => 456,
                         'hijKlm' => 123,
                     ),
-                ),
+                )
             ),
             array(
                 'abcEfg' => 456,
@@ -1183,7 +1183,7 @@ class ArraysTest extends TestCase
                 array(
                     'abcEfg' => 123,
                     'hijKlm' => 456,
-                ),
+                )
             ),
             456
         );
@@ -1217,7 +1217,7 @@ class ArraysTest extends TestCase
                 array(
                     'abcEfg' => 123,
                     'hijKlm' => 456,
-                ),
+                )
             ),
             array(
                 array(
@@ -1240,7 +1240,7 @@ class ArraysTest extends TestCase
                     'abcEfg' => array(
                         'hijKlm' => 123,
                     ),
-                ),
+                )
             ),
             array(
                 'abcEfg.hijKlm' => 123
@@ -1254,7 +1254,7 @@ class ArraysTest extends TestCase
             Arrays::undot(
                 array(
                     'abcEfg.hijKlm' => 123
-                ),
+                )
             ),
             array(
                 'abcEfg' => array(
