@@ -565,7 +565,7 @@ class Arrays
     {
         if (is_null($callback)) {
             if (empty($array)) {
-                return value($default);
+                return static::value($default);
             }
 
             foreach ($array as $item) {
@@ -579,7 +579,7 @@ class Arrays
             }
         }
 
-        return value($default);
+        return static::value($default);
     }
 
     /**
@@ -593,7 +593,7 @@ class Arrays
     public static function last($array, callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : end($array);
+            return empty($array) ? static::value($default) : end($array);
         }
 
         return static::first(array_reverse($array, true), $callback, $default);
