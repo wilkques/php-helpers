@@ -304,16 +304,18 @@ class ArraysTest extends TestCase
 
     public function testWhere()
     {
+        $self = $this;
+
         $array = Arrays::where(
             array(
                 123, null, '', 0, 456, 'abc' => null, 'efg' => '', 'hij' => 0
             ),
-            function ($item, $index) {
-                $this->assertTrue(in_array($index, array(0, 1, 2, 3, 4, 'abc', 'efg', 'hij')));
+            function ($item, $index) use ($self) {
+                $self->assertTrue(in_array($index, array(0, 1, 2, 3, 4, 'abc', 'efg', 'hij')));
 
-                $this->assertTrue(in_array($item, array(123, null, '', 0, 456)));
+                $self->assertTrue(in_array($item, array(123, null, '', 0, 456)));
 
-                $this->assertTrue(in_array($item, array('123', null, '', '0', '456')));
+                $self->assertTrue(in_array($item, array('123', null, '', '0', '456')));
 
                 return $item;
             }

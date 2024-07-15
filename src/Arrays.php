@@ -446,8 +446,6 @@ class Arrays
      */
     public static function filter($array, $callback)
     {
-        // return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
-
         $newArray = array();
 
         foreach ($array as $key => $value) {
