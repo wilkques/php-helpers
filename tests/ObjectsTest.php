@@ -80,7 +80,7 @@ class ObjectsTest extends TestCase
         );
 
         // Create a mock object for the MyArray class
-        $mock = $this->createMock(\ArrayAccess::class);
+        $mock = $this->createMock('\ArrayAccess');
 
         // Set up expectations for offsetExists method
         $mock->method('offsetExists')
