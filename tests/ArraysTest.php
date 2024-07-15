@@ -445,11 +445,11 @@ class ArraysTest extends TestCase
         );
 
         $this->assertTrue(
-            Arrays::accessible($this->createMock(\ArrayAccess::class))
+            Arrays::accessible($this->createMock('\ArrayAccess'))
         );
 
         $this->assertFalse(
-            Arrays::accessible($this->createMock(\Traversable::class))
+            Arrays::accessible($this->createMock('\Traversable'))
         );
 
         $this->assertFalse(
@@ -506,7 +506,7 @@ class ArraysTest extends TestCase
         );
 
         // Create a mock object for the MyArray class
-        $mock = $this->createMock(\ArrayAccess::class);
+        $mock = $this->createMock('\ArrayAccess');
 
         // Set up expectations for offsetExists method
         $mock->method('offsetExists')
@@ -541,11 +541,11 @@ class ArraysTest extends TestCase
         );
 
         $this->assertTrue(
-            Arrays::isIterable($this->createMock(\Traversable::class))
+            Arrays::isIterable($this->createMock('\Traversable'))
         );
 
         $this->assertFalse(
-            Arrays::isIterable($this->createMock(\ArrayAccess::class))
+            Arrays::isIterable($this->createMock('\ArrayAccess'))
         );
 
         $this->assertFalse(
