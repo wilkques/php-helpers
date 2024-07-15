@@ -334,10 +334,10 @@ if (!function_exists('json_error_check')) {
                 break;
         }
 
-        return [
+        return array(
             'code'      => json_last_error(),
-            'message'   => $message
-        ];
+            'message'   => $message,
+        );
     }
 }
 
