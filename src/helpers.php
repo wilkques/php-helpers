@@ -239,36 +239,6 @@ if (!function_exists('array_merge_distinct_recursive')) {
     }
 }
 
-if (!function_exists('dir_scan')) {
-    /**
-     * @param string $dir
-     * 
-     * @return \Generator<string>
-     */
-    function dir_scan($dir)
-    {
-        $stack = new SplStack();
-
-        $stack->push($dir);
-
-        while (!$stack->isEmpty()) {
-            $currentDir = $stack->pop();
-
-            foreach (scandir($currentDir) as $path) {
-                if (!in_array($path, array(".", ".."))) {
-                    $findPath = $currentDir . DIRECTORY_SEPARATOR . $path;
-
-                    if (is_dir($findPath)) {
-                        $stack->push($findPath);
-                    } else {
-                        yield $findPath;
-                    }
-                }
-            }
-        }
-    }
-}
-
 if (!function_exists('str_starts_with')) {
     /**
      * Determine if a given string starts with a given substring.
