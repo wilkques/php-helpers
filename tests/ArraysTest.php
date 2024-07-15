@@ -446,12 +446,14 @@ class ArraysTest extends TestCase
             Arrays::accessible(new \ArrayIterator())
         );
 
+        $createMock = method_exists($this, 'createMock') ? 'createMock' : 'getMock';
+
         $this->assertTrue(
-            Arrays::accessible($this->createMock('\ArrayAccess'))
+            Arrays::accessible(call_user_func(array($this, $createMock), '\ArrayAccess'))
         );
 
         $this->assertFalse(
-            Arrays::accessible($this->createMock('\Traversable'))
+            Arrays::accessible(call_user_func(array($this, $createMock), '\Traversable'))
         );
 
         $this->assertFalse(
@@ -507,8 +509,10 @@ class ArraysTest extends TestCase
             Arrays::exists($array, 1)
         );
 
+        $createMock = method_exists($this, 'createMock') ? 'createMock' : 'getMock';
+
         // Create a mock object for the MyArray class
-        $mock = $this->createMock('\ArrayAccess');
+        $mock = call_user_func(array($this, $createMock), '\ArrayAccess');
 
         // Set up expectations for offsetExists method
         $mock->method('offsetExists')
@@ -542,12 +546,14 @@ class ArraysTest extends TestCase
             Arrays::isIterable(new \ArrayIterator())
         );
 
+        $createMock = method_exists($this, 'createMock') ? 'createMock' : 'getMock';
+
         $this->assertTrue(
-            Arrays::isIterable($this->createMock('\Traversable'))
+            Arrays::isIterable(call_user_func(array($this, $createMock), '\Traversable'))
         );
 
         $this->assertFalse(
-            Arrays::isIterable($this->createMock('\ArrayAccess'))
+            Arrays::isIterable(call_user_func(array($this, $createMock), '\ArrayAccess'))
         );
 
         $this->assertFalse(

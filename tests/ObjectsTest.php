@@ -79,8 +79,10 @@ class ObjectsTest extends TestCase
             Objects::exists($array, 1)
         );
 
+        $createMock = method_exists($this, 'createMock') ? 'createMock' : 'getMock';
+
         // Create a mock object for the MyArray class
-        $mock = $this->createMock('\ArrayAccess');
+        $mock = call_user_func(array($this, $createMock), '\ArrayAccess');
 
         // Set up expectations for offsetExists method
         $mock->method('offsetExists')
