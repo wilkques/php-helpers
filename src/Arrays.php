@@ -607,7 +607,7 @@ class Arrays
      */
     public static function divide($array)
     {
-        return [array_keys($array), array_values($array)];
+        return array(array_keys($array), array_values($array));
     }
 
     /**
@@ -619,7 +619,7 @@ class Arrays
      */
     public static function dot($array, $prepend = '')
     {
-        $results = [];
+        $results = array();
 
         foreach ($array as $key => $value) {
             if (is_array($value) && !empty($value)) {
@@ -640,7 +640,7 @@ class Arrays
      */
     public static function undot($array)
     {
-        $results = [];
+        $results = array();
 
         foreach ($array as $key => $value) {
             static::set($results, $key, $value);
@@ -660,7 +660,7 @@ class Arrays
     {
         $keys = (array) $keys;
 
-        if (!$array || $keys === []) {
+        if (!$array || $keys === array()) {
             return false;
         }
 
@@ -692,7 +692,7 @@ class Arrays
      */
     public static function flatten($array, $depth = INF)
     {
-        $result = [];
+        $result = array();
 
         foreach ($array as $item) {
             if (!is_array($item)) {
