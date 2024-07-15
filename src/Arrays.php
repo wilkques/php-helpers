@@ -446,7 +446,19 @@ class Arrays
      */
     public static function filter($array, $callback)
     {
-        return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+        // return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
+
+        $newArray = array();
+
+        foreach ($array as $key => $value) {
+            $result = $callback($value, $key);
+
+            if ($result) {
+                $newArray[$key] = $value;
+            }
+        }
+
+        return $newArray;
     }
 
     /**
@@ -557,11 +569,11 @@ class Arrays
      * Return the first element in an array passing a given truth test.
      *
      * @param  iterable  $array
-     * @param  callable|null  $callback
+     * @param  callback|\Closure|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function first($array, callable $callback = null, $default = null)
+    public static function first($array, $callback = null, $default = null)
     {
         if (is_null($callback)) {
             if (empty($array)) {
@@ -586,11 +598,11 @@ class Arrays
      * Return the last element in an array passing a given truth test.
      *
      * @param  array  $array
-     * @param  callable|null  $callback
+     * @param  callback|\Closure|null  $callback
      * @param  mixed  $default
      * @return mixed
      */
-    public static function last($array, callable $callback = null, $default = null)
+    public static function last($array, $callback = null, $default = null)
     {
         if (is_null($callback)) {
             return empty($array) ? static::value($default) : end($array);
