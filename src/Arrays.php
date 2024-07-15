@@ -444,8 +444,16 @@ class Arrays
      * 
      * @return mixed
      */
-    public static function filter($array, $callback)
+    public static function filter($array, $callback = null)
     {
+        if (!$callback) {
+            return array_filter($array);
+        }
+
+        if (!is_callable($callback) || $callback instanceof \Closure) {
+            throw new \InvalidArgumentException("Argument 2 must be callback");
+        }
+
         $newArray = array();
 
         foreach ($array as $key => $value) {
