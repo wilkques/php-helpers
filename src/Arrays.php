@@ -128,7 +128,7 @@ class Arrays
      */
     public static function where($array, $callback)
     {
-        return Arrays::filter($array, $callback);
+        return static::filter($array, $callback);
     }
 
     /**
@@ -450,7 +450,7 @@ class Arrays
             return array_filter($array);
         }
 
-        if (!is_callable($callback) || $callback instanceof \Closure) {
+        if (!is_callable($callback) || !$callback instanceof \Closure) {
             throw new \InvalidArgumentException("Argument 2 must be callback");
         }
 
