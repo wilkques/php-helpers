@@ -70,17 +70,19 @@ class ArraysTest extends TestCase
 
     public function testMap()
     {
+        $self = $this;
+
         $array = Arrays::map(
             array(
                 'abcEfg' => 123,
                 'hijKlm' => 456
             ),
-            function ($item, $index) {
-                $this->assertTrue(in_array($index, array('abcEfg', 'hijKlm')));
+            function ($item, $index) use ($self) {
+                $self->assertTrue(in_array($index, array('abcEfg', 'hijKlm')));
 
-                $this->assertTrue(in_array($item, array('123', '456')));
+                $self->assertTrue(in_array($item, array('123', '456')));
 
-                $this->assertTrue(in_array($item, array(123, 456)));
+                $self->assertTrue(in_array($item, array(123, 456)));
 
                 return array($item, $index);
             }
