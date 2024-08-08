@@ -332,4 +332,11 @@ class StringsTest extends TestCase
             'abcEfg'
         );
     }
+
+    public function testRand()
+    {
+        $rand = Strings::rand(100);
+
+        $this->assertEquals(100, strlen($rand));
+    }
 }
