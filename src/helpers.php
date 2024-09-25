@@ -388,6 +388,21 @@ if (!function_exists("array_get")) {
     }
 }
 
+if (!function_exists("array_has")) {
+    /**
+     * Get an item from an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function array_has($array, $key)
+    {
+        return Arrays::has($array, $key);
+    }
+}
+
 if (!function_exists("accessible")) {
     /**
      * Determine whether the given value is array accessible.
