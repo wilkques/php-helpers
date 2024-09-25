@@ -395,7 +395,7 @@ if (!function_exists("array_has")) {
      * @param  \ArrayAccess|array  $array
      * @param  string|int|null  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return bool
      */
     function array_has($array, $key)
     {
