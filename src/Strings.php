@@ -191,4 +191,17 @@ class Strings
 
         return $randstr;
     }
+
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    public static function getClassBaseName($class)
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+
+        return basename(str_replace('\\', '/', $class));
+    }
 }
