@@ -75,7 +75,7 @@ class StringsTest extends TestCase
             Strings::camel('abc_efg_hij'),
             'abcEfgHij'
         );
-        
+
         $this->assertEquals(
             Strings::camel('abc-efg'),
             'abcEfg'
@@ -108,12 +108,12 @@ class StringsTest extends TestCase
             Strings::lower('abC'),
             'abc'
         );
-        
+
         $this->assertEquals(
             Strings::lower('abc_efg'),
             'abc_efg'
         );
-        
+
         $this->assertEquals(
             Strings::lower('ABC_EFG'),
             'abc_efg'
@@ -128,7 +128,7 @@ class StringsTest extends TestCase
             Strings::lower('ABC_EFG_HIJ'),
             'abc_efg_hij'
         );
-        
+
         $this->assertEquals(
             Strings::lower('abc-efg-hij'),
             'abc-efg-hij'
@@ -161,12 +161,12 @@ class StringsTest extends TestCase
             Strings::upper('abC'),
             'ABC'
         );
-        
+
         $this->assertEquals(
             Strings::upper('abc_efg'),
             'ABC_EFG'
         );
-        
+
         $this->assertEquals(
             Strings::upper('ABC_EFG'),
             'ABC_EFG'
@@ -181,7 +181,7 @@ class StringsTest extends TestCase
             Strings::upper('ABC_EFG_HIJ'),
             'ABC_EFG_HIJ'
         );
-        
+
         $this->assertEquals(
             Strings::upper('abc-efg-hij'),
             'ABC-EFG-HIJ'
@@ -198,15 +198,15 @@ class StringsTest extends TestCase
         $this->assertTrue(
             Strings::startsWith('Hello World!', 'Hello')
         );
-        
+
         $this->assertTrue(
             Strings::startsWith('Hello World!', 'H')
         );
-        
+
         $this->assertFalse(
             Strings::startsWith('Hello World!', 'e')
         );
-        
+
         $this->assertFalse(
             Strings::startsWith('Hello World!', 'World')
         );
@@ -217,15 +217,15 @@ class StringsTest extends TestCase
         $this->assertTrue(
             Strings::endsWith('Hello World!', 'World!')
         );
-        
+
         $this->assertTrue(
             Strings::endsWith('Hello World!', '!')
         );
-        
+
         $this->assertFalse(
             Strings::endsWith('Hello World!', 'H')
         );
-        
+
         $this->assertFalse(
             Strings::endsWith('Hello World!', 'World')
         );
@@ -242,7 +242,7 @@ class StringsTest extends TestCase
             Strings::delimiterReplace('abcEfgHij', '_'),
             'abc_efg_hij'
         );
-        
+
         $this->assertEquals(
             Strings::delimiterReplace('abcEfg', '-'),
             'abc-efg'
@@ -260,17 +260,17 @@ class StringsTest extends TestCase
             Strings::convertCase('abc'),
             'abc'
         );
-        
+
         $this->assertEquals(
             Strings::convertCase('abc', MB_CASE_UPPER),
             'ABC'
         );
-        
+
         $this->assertEquals(
             Strings::convertCase('ABC'),
             'abc'
         );
-        
+
         $this->assertEquals(
             Strings::convertCase('ABC', MB_CASE_UPPER),
             'ABC'
@@ -343,5 +343,9 @@ class StringsTest extends TestCase
     public function testGetClassBaseName()
     {
         $this->assertEquals(Strings::getClassBaseName('\Wilkques\Helpers\Objects'), 'Objects');
+
+        $abstract = new \Wilkques\Helpers\Objects;
+
+        $this->assertEquals(Strings::getClassBaseName($abstract), 'Objects');
     }
 }
