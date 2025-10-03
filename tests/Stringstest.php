@@ -339,4 +339,9 @@ class StringsTest extends TestCase
 
         $this->assertEquals(100, strlen($rand));
     }
+
+    public function testGetClassBaseName()
+    {
+        $this->assertEquals(Strings::getClassBaseName('\Wilkques\Helpers\Objects'), 'Objects');
+    }
 }
