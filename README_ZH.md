@@ -39,6 +39,60 @@ array_get(['user' => ['name' => 'Wilkques']], 'user.name');
 str_snake('helloWorld');
 ```
 
+### 更多 `Arrays` 範例
+
+```php
+$users = [
+    ['id' => 1, 'name' => 'Alice'],
+    ['id' => 2, 'name' => 'Bob'],
+];
+
+Arrays::pluck($users, 'name', 'id'); // [1 => 'Alice', 2 => 'Bob']
+
+$rows = [['age' => 30], ['age' => 20], ['age' => 25]];
+Arrays::sort($rows, 'age'); // 依每個 row 的 'age' key 由小到大排序
+
+list($even, $odd) = Arrays::partition([1, 2, 3, 4, 5], function ($n) {
+    return $n % 2 === 0;
+});
+// $even = [2, 4]，$odd = [1, 3, 5]
+
+Arrays::flatten(['a' => 1, [2, 3]]); // [1, 2, 3]
+Arrays::take([1, 2, 3, 4], 2);       // [1, 2]
+Arrays::take([1, 2, 3, 4], -2);      // [3, 4]
+Arrays::wrap(null);                  // []
+Arrays::wrap('a');                   // ['a']
+```
+
+### 更多 `Strings` 範例
+
+```php
+Strings::slug('Hello World!');                        // 'hello-world'
+Strings::mask('taylor@example.com', '*', 3);           // 'tay***************'
+Strings::limit('The quick brown fox', 9);              // 'The quick...'
+Strings::plural('box');                                 // 'boxes'
+Strings::singular('boxes');                              // 'box'
+Strings::headline('email_verified_at');                 // 'Email Verified At'
+```
+
+### `Objects` —— 同時支援陣列與物件混合的 dot notation
+
+`Arrays::get`/`set` 只會走陣列（以及 `ArrayAccess`）。`Objects::get`/`set`（以及建構在它們之上的 `data_get()`/`data_set()` 全域函式）連物件屬性也會一併處理，所以同一條 dot-notation 路徑可以在同一次呼叫裡同時跨陣列與物件：
+
+```php
+use Wilkques\Helpers\Objects;
+
+$config = (object) ['db' => ['host' => 'localhost']];
+
+Objects::get($config, 'db.host'); // 'localhost' —— 先取物件屬性，再取陣列 key
+
+Objects::set($config, 'db.port', 5432);
+$config->db['port']; // 5432
+
+// 用全域函式也一樣
+data_get($config, 'db.host');
+```
+
 ### Collections
 
 `collect()`（或 `new Collections($items)`）可以把陣列、JSON 字串、`Traversable`、或 `JsonSerializable` 包裝成一個可鏈式呼叫、每次操作都回傳新實例（immutable-per-call）的 collection——實作了 `Countable`、`IteratorAggregate`、`ArrayAccess`，用法很接近 Laravel 的 `Collection`。
@@ -56,6 +110,31 @@ foreach (collect(['a' => 1, 'b' => 2]) as $key => $value) {
 ```
 
 轉換類方法（`map`、`filter`、`reject`、`pluck`、`sortBy`、`groupBy`、`chunk`……）都會回傳**新的** `Collections` 實例，不會動到原本的集合——跟 Laravel 行為一致。只有明確標示為 mutating 的方法（`push`、`put`、`set`、`forget`、`pull`、`prepend`）才會直接修改當前集合。
+
+```php
+$people = collect([
+    ['role' => 'admin', 'name' => 'Alice'],
+    ['role' => 'user',  'name' => 'Bob'],
+    ['role' => 'admin', 'name' => 'Carol'],
+]);
+
+$adminNames = $people->groupBy('role')->get('admin')->pluck('name')->all();
+// ['Alice', 'Carol']
+
+$people->sortBy('name')->pluck('name')->all();
+// ['Alice', 'Bob', 'Carol']
+
+collect([1, 2, 2, 3, 3, 3])->unique()->values()->all(); // [1, 2, 3]
+
+collect([1, 2, 3, 4, 5])->chunk(2)->count(); // 3
+
+collect([1, 2, 3])->contains(function ($n) { return $n > 2; }); // true
+
+// mutating 方法會操作 $this 並回傳它自己，可以串接呼叫
+$cart = collect(['total' => 0]);
+$cart->set('total', 100)->set('currency', 'USD');
+$cart->all(); // ['total' => 100, 'currency' => 'USD']
+```
 
 ## API 參考
 
