@@ -138,120 +138,161 @@ $cart->all(); // ['total' => 100, 'currency' => 'USD']
 
 ## API Reference
 
+Every method below has a runnable example (verified on PHP 7.4 and on real PHP 5.3.10).
+
 ### `Wilkques\Helpers\Arrays`
 
 Dot-notation aware array helpers, largely mirroring Laravel's `Illuminate\Support\Arr`.
 
-| Method | Description |
-| --- | --- |
-| `only($array, $keys)` | Get a subset of items by key. |
-| `except($array, $keys)` | Get all items except the given keys. |
-| `get($array, $key, $default = null)` | Get a value using dot notation. |
-| `set(&$array, $key, $value)` | Set a value using dot notation. |
-| `has($array, $keys)` | Determine if one or more keys exist (dot notation). |
-| `forget(&$array, $keys)` | Remove one or more keys (dot notation). |
-| `pull(&$array, $key, $default = null)` | Get a value and remove it from the array. |
-| `exists($array, $key)` | Check if a key exists (array or `ArrayAccess`). |
-| `accessible($value)` | Determine if a value is array-accessible. |
-| `isIterable($value)` | Determine if a value is an array or `Traversable`. |
-| `isList($array)` | Determine if an array is a sequential, zero-based list. |
-| `isAssoc($array)` | Determine if an array is associative (not a list). |
-| `map($array, $callback)` | Map over an array, callback receives `($value, $key)`. |
-| `mapWithKeys($array, $callback)` | Map and re-key in one pass. |
-| `where($array, $callback)` / `filter($array, $callback = null)` | Filter by callback (any `callable`), or `array_filter` when omitted. |
-| `whereNotNull($array)` | Filter out `null` values. |
-| `reduce($array, $callback, $initial = null)` | Reduce to a single value. |
-| `pluck($array, $value, $key = null, $case = null)` | Pluck a column, optionally keyed and case-converted. |
-| `column($array, $columnKey, $indexKey = null)` | `array_column` with dot-notation support. |
-| `first($array, $callback = null, $default = null)` | First element, optionally matching a callback. |
-| `last($array, $callback = null, $default = null)` | Last element, optionally matching a callback. |
-| `flatten($array, $depth = INF)` | Flatten a multi-dimensional array. |
-| `collapse($array)` | Collapse an array of arrays into one array. |
-| `dot($array, $prepend = '')` | Flatten to single-level dot notation. |
-| `undot($array)` | Expand a dot-notation array back out. |
-| `divide($array)` | Split into `[keys, values]`. |
-| `wrap($value)` | Wrap a non-array value in an array (`null` becomes `[]`). |
-| `prepend($array, $value, $key = null)` | Push a value onto the front of an array. |
-| `random($array, $number = null, $preserveKeys = false)` | Get one or more random values. |
-| `shuffle($array, $seed = null)` | Shuffle an array. |
-| `sort($array, $callback = null)` / `sortDesc($array, $callback = null)` | Sort by value, callback, or dot-notation key. |
-| `sortRecursive($array, $options = SORT_REGULAR, $descending = false)` | Recursively sort by keys and values. |
-| `partition($array, $callback)` | Split into `[passed, failed]` arrays. |
-| `crossJoin(...$arrays)` | Cross join arrays into every permutation. |
-| `join($array, $glue, $finalGlue = '')` | Join with a different glue before the final item. |
-| `take($array, $limit)` | Take the first (or, with a negative limit, last) N items. |
-| `query($array)` | Build a URL query string. |
-| `replace(...$arrays)` / `replaceRecursive(...$arrays)` | `array_replace(_recursive)` wrappers. |
-| `mergeDistinctRecursive(...$arrays)` | Recursively merge, later values win on scalar conflicts. |
-| `takeOffRecursive(&$array, $key, $default = null)` | Get and remove a value via dot notation (supports `*`). |
-| `value($value, ...$args)` | Resolve a value, calling it if it's a `Closure`. |
-| `keySnake($array)` / `keyCamel($array)` | Convert all top-level keys to snake_case / camelCase. |
-| `keySnakeToCamel($array)` / `keyKebabCaseToCamel($array)` | Aliases of `keyCamel`. |
-| `keyFields($array, $sort)` / `fields($array, $sort)` | Reorder an array to match a given key/value order. |
+| Method | Description | Example |
+| --- | --- | --- |
+| `only($array, $keys)` | Get a subset of items by key. | `Arrays::only(['name' => 'Wilkques', 'age' => 30], ['name']); // ['name' => 'Wilkques']` |
+| `except($array, $keys)` | Get all items except the given keys. | `Arrays::except(['name' => 'Wilkques', 'age' => 30], ['age']); // ['name' => 'Wilkques']` |
+| `get($array, $key, $default = null)` | Get a value using dot notation. | `Arrays::get(['user' => ['name' => 'Wilkques']], 'user.name'); // 'Wilkques'` |
+| `set(&$array, $key, $value)` | Set a value using dot notation. | `Arrays::set($array, 'user.name', 'Wilkques'); // $array === ['user' => ['name' => 'Wilkques']]` |
+| `has($array, $keys)` | Determine if one or more keys exist (dot notation). | `Arrays::has(['user' => ['name' => 'Wilkques']], 'user.name'); // true` |
+| `forget(&$array, $keys)` | Remove one or more keys (dot notation). | `Arrays::forget($array, 'age'); // $array no longer has an 'age' key` |
+| `pull(&$array, $key, $default = null)` | Get a value and remove it from the array. | `Arrays::pull($array, 'age'); // 30 (and removed from $array)` |
+| `exists($array, $key)` | Check if a key exists (array or `ArrayAccess`). | `Arrays::exists(['name' => 'Wilkques'], 'name'); // true` |
+| `accessible($value)` | Determine if a value is array-accessible. | `Arrays::accessible([]); // true` |
+| `isIterable($value)` | Determine if a value is an array or `Traversable`. | `Arrays::isIterable(new ArrayIterator([])); // true` |
+| `isList($array)` | Determine if an array is a sequential, zero-based list. | `Arrays::isList([1, 2, 3]); // true` |
+| `isAssoc($array)` | Determine if an array is associative (not a list). | `Arrays::isAssoc(['a' => 1]); // true` |
+| `map($array, $callback)` | Map over an array, callback receives `($value, $key)`. | `Arrays::map([1, 2], function ($v, $k) { return $v * 10; }); // [10, 20]` |
+| `mapWithKeys($array, $callback)` | Map and re-key in one pass. | `Arrays::mapWithKeys([['id' => 1, 'name' => 'a']], function ($v) { return [$v['id'] => $v['name']]; }); // [1 => 'a']` |
+| `where($array, $callback)` | Filter by callback. | `Arrays::where([0, 1, 2, 0, 3], function ($v) { return $v > 0; }); // [1 => 1, 2 => 2, 4 => 3]` |
+| `filter($array, $callback = null)` | Filter by callback (any `callable`), or `array_filter` when omitted. | `Arrays::filter([0, 1, 2, '', 3]); // [1 => 1, 2 => 2, 4 => 3]` |
+| `whereNotNull($array)` | Filter out `null` values. | `Arrays::whereNotNull([1, null, 2]); // [0 => 1, 2 => 2]` |
+| `reduce($array, $callback, $initial = null)` | Reduce to a single value. | `Arrays::reduce([1, 2, 3], function ($c, $i) { return $c + $i; }, 0); // 6` |
+| `pluck($array, $value, $key = null, $case = null)` | Pluck a column, optionally keyed and case-converted. | `Arrays::pluck([['id' => 1, 'name' => 'Alice']], 'name', 'id'); // [1 => 'Alice']` |
+| `column($array, $columnKey, $indexKey = null)` | `array_column` with dot-notation support. | `Arrays::column([['id' => 1, 'name' => 'Alice']], 'name', 'id'); // [1 => 'Alice']` |
+| `first($array, $callback = null, $default = null)` | First element, optionally matching a callback. | `Arrays::first([1, 2, 3], function ($v) { return $v > 1; }); // 2` |
+| `last($array, $callback = null, $default = null)` | Last element, optionally matching a callback. | `Arrays::last([1, 2, 3], function ($v) { return $v < 3; }); // 2` |
+| `flatten($array, $depth = INF)` | Flatten a multi-dimensional array. | `Arrays::flatten(['a' => 1, [2, 3]]); // [1, 2, 3]` |
+| `collapse($array)` | Collapse an array of arrays into one array. | `Arrays::collapse([[1, 2], [3, 4]]); // [1, 2, 3, 4]` |
+| `dot($array, $prepend = '')` | Flatten to single-level dot notation. | `Arrays::dot(['user' => ['name' => 'Wilkques']]); // ['user.name' => 'Wilkques']` |
+| `undot($array)` | Expand a dot-notation array back out. | `Arrays::undot(['user.name' => 'Wilkques']); // ['user' => ['name' => 'Wilkques']]` |
+| `divide($array)` | Split into `[keys, values]`. | `Arrays::divide(['name' => 'Wilkques', 'age' => 30]); // [['name', 'age'], ['Wilkques', 30]]` |
+| `wrap($value)` | Wrap a non-array value in an array (`null` becomes `[]`). | `Arrays::wrap('a'); // ['a']` and `Arrays::wrap(null); // []` |
+| `prepend($array, $value, $key = null)` | Push a value onto the front of an array. | `Arrays::prepend([1, 2], 0); // [0, 1, 2]` |
+| `random($array, $number = null, $preserveKeys = false)` | Get one or more random values. | `Arrays::random([1, 2, 3], 2); // e.g. [2, 1]` |
+| `shuffle($array, $seed = null)` | Shuffle an array. | `Arrays::shuffle([1, 2, 3]); // e.g. [3, 1, 2]` |
+| `sort($array, $callback = null)` | Sort by value, callback, or dot-notation key. | `Arrays::sort([3, 1, 2]); // [1 => 1, 2 => 2, 0 => 3]` |
+| `sortDesc($array, $callback = null)` | Sort descending. | `Arrays::sortDesc([1, 3, 2]); // [1 => 3, 2 => 2, 0 => 1]` |
+| `sortRecursive($array, $options = SORT_REGULAR, $descending = false)` | Recursively sort by keys and values. | `Arrays::sortRecursive(['b' => [3, 1, 2], 'a' => 1]); // ['a' => 1, 'b' => [1, 2, 3]]` |
+| `partition($array, $callback)` | Split into `[passed, failed]` arrays. | `list($even, $odd) = Arrays::partition([1, 2, 3, 4], function ($n) { return $n % 2 === 0; }); // $even = [1 => 2, 3 => 4]` |
+| `crossJoin(...$arrays)` | Cross join arrays into every permutation. | `Arrays::crossJoin([1, 2], ['a', 'b']); // [[1,'a'],[1,'b'],[2,'a'],[2,'b']]` |
+| `join($array, $glue, $finalGlue = '')` | Join with a different glue before the final item. | `Arrays::join(['a', 'b', 'c'], ', ', ' and '); // 'a, b and c'` |
+| `take($array, $limit)` | Take the first (or, with a negative limit, last) N items. | `Arrays::take([1, 2, 3, 4], -2); // [3, 4]` |
+| `query($array)` | Build a URL query string. | `Arrays::query(['foo' => 'bar', 'baz' => 'qux']); // 'foo=bar&baz=qux'` |
+| `replace(...$arrays)` | `array_replace` wrapper. | `Arrays::replace(['a' => 1, 'b' => 2], ['b' => 3]); // ['a' => 1, 'b' => 3]` |
+| `replaceRecursive(...$arrays)` | `array_replace_recursive` wrapper. | `Arrays::replaceRecursive(['a' => ['x' => 1]], ['a' => ['y' => 2]]); // ['a' => ['x' => 1, 'y' => 2]]` |
+| `mergeDistinctRecursive(...$arrays)` | Recursively merge, later values win on scalar conflicts. | `Arrays::mergeDistinctRecursive(['a' => 1], ['b' => 2]); // ['a' => 1, 'b' => 2]` |
+| `takeOffRecursive(&$array, $key, $default = null)` | Get and remove a value via dot notation (supports `*`). | `Arrays::takeOffRecursive($array, 'user.name'); // 'Wilkques' (and removed from $array)` |
+| `value($value, ...$args)` | Resolve a value, calling it if it's a `Closure`. | `Arrays::value(function () { return 'bar'; }); // 'bar'` |
+| `keySnake($array)` | Convert all top-level keys to snake_case. | `Arrays::keySnake(['userName' => 'Wilkques']); // ['user_name' => 'Wilkques']` |
+| `keyCamel($array)` | Convert all top-level keys to camelCase. | `Arrays::keyCamel(['user_name' => 'Wilkques']); // ['userName' => 'Wilkques']` |
+| `keySnakeToCamel($array)` | Alias of `keyCamel`. | `Arrays::keySnakeToCamel(['user_name' => 'Wilkques']); // ['userName' => 'Wilkques']` |
+| `keyKebabCaseToCamel($array)` | Alias of `keyCamel`. | `Arrays::keyKebabCaseToCamel(['user-name' => 'Wilkques']); // ['userName' => 'Wilkques']` |
+| `keyFields($array, $sort)` | Reorder an array to match a given key order. | `array_keys(Arrays::keyFields(['b' => 2, 'a' => 1], ['a', 'b'])); // ['a', 'b']` |
+| `fields($array, $sort)` | Reorder an array to match a given value order. | `array_values(Arrays::fields(['b' => 2, 'a' => 1], [1, 2])); // [1, 2]` |
 
 ### `Wilkques\Helpers\Strings`
 
 Mirrors much of Laravel's `Illuminate\Support\Str`, multibyte-safe (`mb_*` under the hood).
 
-| Method | Description |
-| --- | --- |
-| `contains($haystack, $needles)` | Determine if a string contains any of the given substrings. |
-| `startsWith($haystack, $needles)` / `endsWith($haystack, $needles)` | Prefix / suffix checks. |
-| `lower($value)` / `upper($value)` | Multibyte case conversion. |
-| `ucfirst($value)` | Uppercase the first character (multibyte-safe). |
-| `snake($value)` / `kebab($value)` / `camel($value)` / `studly($value)` | Case style conversion. |
-| `snakeToCamel($value)` / `kebabCaseToCamel($value)` | Explicit case-style conversions. |
-| `delimiterReplace($value, $delimiter = '_')` | Insert a delimiter at camelCase boundaries. |
-| `convertCase($value, $case = MB_CASE_LOWER)` | `mb_convert_case` wrapper. |
-| `slug($title, $separator = '-')` | Generate a URL-friendly slug. |
-| `limit($value, $limit = 100, $end = '...')` | Truncate a string to a given length. |
-| `mask($string, $character, $index, $length = null)` | Mask a portion of a string. |
-| `padLeft` / `padRight` / `padBoth($value, $length, $pad = ' ')` | `str_pad` wrappers. |
-| `headline($value)` | Convert to `Title Case With Spaces`. |
-| `squish($value)` | Collapse consecutive whitespace and trim. |
-| `wordCount($string, $characters = null)` | Count words in a string. |
-| `isUuid($value)` / `isUlid($value)` | Validate UUID / ULID format. |
-| `plural($value, $count = 2)` / `singular($value)` | Pluralize / singularize common English words (a small hand-picked rule set, **not** a full inflector). |
-| `rand($length)` | Generate a random alphanumeric string. |
-| `getClassBaseName($class)` | Get the short class name of an object or FQCN. |
+| Method | Description | Example |
+| --- | --- | --- |
+| `contains($haystack, $needles)` | Determine if a string contains any of the given substrings. | `Strings::contains('hello world', 'world'); // true` |
+| `startsWith($haystack, $needles)` | Prefix check. | `Strings::startsWith('hello world', 'hello'); // true` |
+| `endsWith($haystack, $needles)` | Suffix check. | `Strings::endsWith('hello world', 'world'); // true` |
+| `lower($value)` | Multibyte-safe lowercase. | `Strings::lower('HELLO'); // 'hello'` |
+| `upper($value)` | Multibyte-safe uppercase. | `Strings::upper('hello'); // 'HELLO'` |
+| `ucfirst($value)` | Uppercase the first character (multibyte-safe). | `Strings::ucfirst('hello'); // 'Hello'` |
+| `snake($value)` | Convert to snake_case. | `Strings::snake('helloWorld'); // 'hello_world'` |
+| `kebab($value)` | Convert to kebab-case. | `Strings::kebab('helloWorld'); // 'hello-world'` |
+| `camel($value)` | Convert to camelCase. | `Strings::camel('hello_world'); // 'helloWorld'` |
+| `studly($value)` | Convert to StudlyCase (PascalCase). | `Strings::studly('hello_world'); // 'HelloWorld'` |
+| `snakeToCamel($value)` | Explicit snake_case -> camelCase. | `Strings::snakeToCamel('hello_world'); // 'helloWorld'` |
+| `kebabCaseToCamel($value)` | Explicit kebab-case -> camelCase. | `Strings::kebabCaseToCamel('hello-world'); // 'helloWorld'` |
+| `delimiterReplace($value, $delimiter = '_')` | Insert a delimiter at camelCase boundaries. | `Strings::delimiterReplace('helloWorld', '-'); // 'hello-world'` |
+| `convertCase($value, $case = MB_CASE_LOWER)` | `mb_convert_case` wrapper. | `Strings::convertCase('hello', MB_CASE_UPPER); // 'HELLO'` |
+| `slug($title, $separator = '-')` | Generate a URL-friendly slug. | `Strings::slug('Hello World!'); // 'hello-world'` |
+| `limit($value, $limit = 100, $end = '...')` | Truncate a string to a given length. | `Strings::limit('The quick brown fox', 9); // 'The quick...'` |
+| `mask($string, $character, $index, $length = null)` | Mask a portion of a string. | `Strings::mask('taylor@example.com', '*', 3); // 'tay***************'` |
+| `padLeft($value, $length, $pad = ' ')` | `str_pad` (`STR_PAD_LEFT`) wrapper. | `Strings::padLeft('7', 3, '0'); // '007'` |
+| `padRight($value, $length, $pad = ' ')` | `str_pad` (`STR_PAD_RIGHT`) wrapper. | `Strings::padRight('7', 3, '0'); // '700'` |
+| `padBoth($value, $length, $pad = ' ')` | `str_pad` (`STR_PAD_BOTH`) wrapper. | `Strings::padBoth('7', 5, '-'); // '--7--'` |
+| `headline($value)` | Convert to `Title Case With Spaces`. | `Strings::headline('email_verified_at'); // 'Email Verified At'` |
+| `squish($value)` | Collapse consecutive whitespace and trim. | `Strings::squish('  hello    world  '); // 'hello world'` |
+| `wordCount($string, $characters = null)` | Count words in a string. | `Strings::wordCount('hello world foo'); // 3` |
+| `isUuid($value)` | Validate UUID format. | `Strings::isUuid('9f8f8f8f-1234-4321-abcd-1234567890ab'); // true` |
+| `isUlid($value)` | Validate ULID format. | `Strings::isUlid('01ARZ3NDEKTSV4RRFFQ69G5FAV'); // true` |
+| `plural($value, $count = 2)` | Pluralize a common English word (small hand-picked rule set, **not** a full inflector). | `Strings::plural('box'); // 'boxes'` |
+| `singular($value)` | Singularize a common English word (same caveat as `plural`). | `Strings::singular('boxes'); // 'box'` |
+| `rand($length)` | Generate a random alphanumeric string. | `strlen(Strings::rand(8)); // 8` |
+| `getClassBaseName($class)` | Get the short class name of an object or FQCN. | `Strings::getClassBaseName('Wilkques\Helpers\Objects'); // 'Objects'` |
 
 ### `Wilkques\Helpers\Objects`
 
 Dot-notation get/set that works across **mixed** arrays and objects (property access), backing the `data_get()` / `data_set()` global helpers.
 
-| Method | Description |
-| --- | --- |
-| `get($target, $key, $default = null)` | Get a value from an array or object using dot notation. |
-| `set(&$target, $key, $value, $overwrite = true)` | Set a value on an array or object using dot notation. |
-| `exists($array, $key)` | Check if a key exists (array or `ArrayAccess`). |
-| `accessible($value)` | Determine if a value is array-accessible. |
-| `value($value, ...$args)` | Resolve a value, calling it if it's a `Closure`. |
+| Method | Description | Example |
+| --- | --- | --- |
+| `get($target, $key, $default = null)` | Get a value from an array or object using dot notation. | `Objects::get($config, 'db.host'); // 'localhost'` |
+| `set(&$target, $key, $value, $overwrite = true)` | Set a value on an array or object using dot notation. | `Objects::set($config, 'db.port', 5432); // $config->db['port'] === 5432` |
+| `exists($array, $key)` | Check if a key exists (array or `ArrayAccess`). | `Objects::exists(['name' => 'Wilkques'], 'name'); // true` |
+| `accessible($value)` | Determine if a value is array-accessible. | `Objects::accessible([]); // true` |
+| `value($value, ...$args)` | Resolve a value, calling it if it's a `Closure`. | `Objects::value(function () { return 'bar'; }); // 'bar'` |
 
 ### `Wilkques\Helpers\Collections`
 
-| Method | Description |
-| --- | --- |
-| `new Collections($items = [])` / `Collections::make($items = [])` | Build from an array, JSON string, another `Collections`, `Traversable`, or `JsonSerializable`. |
-| `all()` / `toArray()` / `toJson($options = 0)` | Export the underlying items. |
-| `count()` / `isEmpty()` / `isNotEmpty()` | Size checks. |
-| `map($callback)` / `mapWithKeys($callback)` | Transform items (returns a new collection). |
-| `filter($callback = null)` / `reject($callback)` / `whereNotNull()` | Filter items (returns a new collection). |
-| `pluck($value, $key = null)` | Pluck a column. |
-| `values()` / `keys()` / `flip()` | Re-index, extract keys, or swap keys/values. |
-| `only($keys)` / `except($keys)` | Subset by key. |
-| `merge($items)` | Merge with another array/collection. |
-| `unique($key = null)` | Remove duplicates, optionally by key/callback. |
-| `flatten($depth = INF)` / `collapse()` | Flatten nested arrays. |
-| `sort($callback = null)` / `sortDesc($callback = null)` / `sortBy($callback)` / `sortByDesc($callback)` | Sort by value, callback, or dot-notation key. |
-| `chunk($size)` | Split into a collection of collections. |
-| `groupBy($groupBy)` / `keyBy($keyBy)` | Group or re-key by a callback or dot-notation key. |
-| `implode($value, $glue = null)` | Join scalar items, or pluck-then-join for arrays of arrays. |
-| `reduce($callback, $initial = null)` | Reduce to a single value. |
-| `each($callback)` | Iterate; return `false` from the callback to stop early. |
-| `first($callback = null, $default = null)` / `last($callback = null, $default = null)` | Get the first/last item, optionally matching a callback. |
-| `contains($key, $value = null)` | Check for a value, a callback match, or a key/value pair. |
-| `get($key, $default = null)` / `has($key)` / `set($key, $value)` / `put($key, $value)` / `forget($keys)` / `pull($key, $default = null)` | Dot-notation array access (mutating). |
-| `push($value)` / `prepend($value, $key = null)` | Add items (mutating). |
+| Method | Description | Example |
+| --- | --- | --- |
+| `new Collections($items = [])` | Build from an array, JSON string, another `Collections`, `Traversable`, or `JsonSerializable`. | `(new Collections([1, 2]))->all(); // [1, 2]` |
+| `Collections::make($items = [])` | Same as `new Collections()`, static form. | `Collections::make([1, 2])->all(); // [1, 2]` |
+| `all()` | Get the underlying items array. | `collect([1, 2, 3])->all(); // [1, 2, 3]` |
+| `toArray()` | Recursively convert to a plain array. | `collect(['a' => collect([1, 2])])->toArray(); // ['a' => [1, 2]]` |
+| `toJson($options = 0)` | JSON-encode the items. | `collect(['a' => 1])->toJson(); // '{"a":1}'` |
+| `count()` | Number of items. | `collect([1, 2, 3])->count(); // 3` |
+| `isEmpty()` | Whether the collection has no items. | `collect([])->isEmpty(); // true` |
+| `isNotEmpty()` | Whether the collection has items. | `collect([1])->isNotEmpty(); // true` |
+| `map($callback)` | Transform each item (returns a new collection). | `collect([1, 2])->map(function ($n) { return $n * 10; })->all(); // [10, 20]` |
+| `mapWithKeys($callback)` | Transform and re-key in one pass. | `collect([['id' => 1, 'name' => 'a']])->mapWithKeys(function ($i) { return [$i['id'] => $i['name']]; })->all(); // [1 => 'a']` |
+| `filter($callback = null)` | Keep items matching the callback. | `collect([1, 2, 3, 4])->filter(function ($n) { return $n % 2 === 0; })->all(); // [1 => 2, 3 => 4]` |
+| `reject($callback)` | Drop items matching the callback (inverse of `filter`). | `collect([1, 2, 3, 4])->reject(function ($n) { return $n % 2 === 0; })->all(); // [0 => 1, 2 => 3]` |
+| `whereNotNull()` | Drop `null` items. | `collect([1, null, 2])->whereNotNull()->all(); // [0 => 1, 2 => 2]` |
+| `pluck($value, $key = null)` | Pluck a column. | `collect([['id' => 1, 'name' => 'a']])->pluck('name', 'id')->all(); // [1 => 'a']` |
+| `values()` | Re-index sequentially. | `collect(['a' => 1, 'b' => 2])->values()->all(); // [1, 2]` |
+| `keys()` | Get all the keys. | `collect(['a' => 1, 'b' => 2])->keys()->all(); // ['a', 'b']` |
+| `flip()` | Swap keys and values. | `collect(['a' => 1])->flip()->all(); // [1 => 'a']` |
+| `only($keys)` | Keep only the given keys. | `collect(['a' => 1, 'b' => 2])->only('a')->all(); // ['a' => 1]` |
+| `except($keys)` | Drop the given keys. | `collect(['a' => 1, 'b' => 2])->except('a')->all(); // ['b' => 2]` |
+| `merge($items)` | Merge with another array/collection. | `collect(['a' => 1])->merge(['b' => 2])->all(); // ['a' => 1, 'b' => 2]` |
+| `unique($key = null)` | Remove duplicates, optionally by key/callback. | `collect([1, 2, 2, 3])->unique()->all(); // [0 => 1, 1 => 2, 3 => 3]` |
+| `flatten($depth = INF)` | Flatten nested arrays. | `collect(['a' => 1, [2, 3]])->flatten()->all(); // [1, 2, 3]` |
+| `collapse()` | Collapse a collection of arrays into one level. | `collect([[1, 2], [3, 4]])->collapse()->all(); // [1, 2, 3, 4]` |
+| `sort($callback = null)` | Sort by value, callback, or dot-notation key. | `collect([3, 1, 2])->sort()->all(); // [1 => 1, 2 => 2, 0 => 3]` |
+| `sortDesc($callback = null)` | Sort descending. | `collect([1, 3, 2])->sortDesc()->all(); // [1 => 3, 2 => 2, 0 => 1]` |
+| `sortBy($callback)` | Alias of `sort()`. | `collect([['age' => 30], ['age' => 20]])->sortBy('age')->pluck('age')->all(); // [20, 30]` |
+| `sortByDesc($callback)` | Alias of `sortDesc()`. | `collect([['age' => 30], ['age' => 20]])->sortByDesc('age')->pluck('age')->all(); // [30, 20]` |
+| `chunk($size)` | Split into a collection of collections. | `collect([1, 2, 3, 4, 5])->chunk(2)->count(); // 3 (sizes 2, 2, 1)` |
+| `groupBy($groupBy)` | Group by a callback or dot-notation key. | `collect([['type' => 'a', 'v' => 1], ['type' => 'b', 'v' => 2]])->groupBy('type')->get('a')->pluck('v')->all(); // [1]` |
+| `keyBy($keyBy)` | Re-key by a callback or dot-notation key. | `collect([['id' => 1, 'name' => 'a']])->keyBy('id')->get(1); // ['id' => 1, 'name' => 'a']` |
+| `implode($value, $glue = null)` | Join scalar items, or pluck-then-join for arrays of arrays. | `collect(['a', 'b', 'c'])->implode(','); // 'a,b,c'` |
+| `reduce($callback, $initial = null)` | Reduce to a single value. | `collect([1, 2, 3])->reduce(function ($c, $n) { return $c + $n; }, 0); // 6` |
+| `each($callback)` | Iterate; return `false` to stop early. | `collect([1, 2, 3])->each(function ($n) { echo $n; }); // prints 123` |
+| `first($callback = null, $default = null)` | First item, optionally matching a callback. | `collect([1, 2, 3])->first(); // 1` |
+| `last($callback = null, $default = null)` | Last item, optionally matching a callback. | `collect([1, 2, 3])->last(); // 3` |
+| `contains($key, $value = null)` | Check for a value, a callback match, or a key/value pair. | `collect([1, 2, 3])->contains(2); // true` |
+| `get($key, $default = null)` | Get a value via dot notation. | `collect(['a' => 1])->get('a'); // 1` |
+| `has($key)` | Check a key exists via dot notation. | `collect(['a' => 1])->has('a'); // true` |
+| `set($key, $value)` | Set a value (mutating, returns `$this`). | `$c->set('b', 2); // $c->get('b') === 2` |
+| `put($key, $value)` | Alias of `set()`. | `$c->put('a', 1); // $c->get('a') === 1` |
+| `forget($keys)` | Remove one or more keys (mutating). | `$c->forget('a'); // $c no longer has 'a'` |
+| `pull($key, $default = null)` | Get a value and remove it (mutating). | `$c->pull('a'); // returns the value, and removes 'a'` |
+| `push($value)` | Append a value (mutating). | `collect([1, 2])->push(3)->all(); // [1, 2, 3]` |
+| `prepend($value, $key = null)` | Prepend a value (mutating). | `collect([1, 2])->prepend(0)->all(); // [0, 1, 2]` |
 
 Implements `Countable`, `IteratorAggregate` and `ArrayAccess`, so `count($collection)`, `foreach`, and `$collection['key']` all work directly.
 
