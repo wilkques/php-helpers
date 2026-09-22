@@ -430,18 +430,19 @@ class Arrays
     /**
      * @param array $array
      * @param callback|\Closure $callback
-     * 
+     * @param mixed $initial
+     *
      * @return mixed
      */
-    public static function reduce($array, $callback)
+    public static function reduce($array, $callback, $initial = null)
     {
-        return array_reduce($array, $callback);
+        return array_reduce($array, $callback, $initial);
     }
 
     /**
      * @param array $array
-     * @param callback|\Closure $callback
-     * 
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     public static function filter($array, $callback = null)
@@ -450,14 +451,14 @@ class Arrays
             return array_filter($array);
         }
 
-        if (!is_callable($callback) || !$callback instanceof \Closure) {
+        if (!is_callable($callback)) {
             throw new \InvalidArgumentException("Argument 2 must be callback");
         }
 
         $newArray = array();
 
         foreach ($array as $key => $value) {
-            $result = $callback($value, $key);
+            $result = call_user_func($callback, $value, $key);
 
             if ($result) {
                 $newArray[$key] = $value;
@@ -778,5 +779,316 @@ class Arrays
         }
 
         return is_array($value) ? $value : array($value);
+    }
+
+    /**
+     * @param array $array
+     * @param int|string $columnKey
+     * @param int|string|null $indexKey
+     * 
+     * @return array
+     */
+    public static function column($array, $columnKey, $indexKey = null)
+    {
+        $result = array();
+
+        foreach ($array as $row) {
+            $key = $value = null;
+
+            $value = Objects::get($row, $columnKey);
+
+            if ($indexKey !== null) {
+                $key = Objects::get($row, $indexKey);
+
+                static::set($result, $key, $value);
+            } else {
+                $result[] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Determine if an array is a list (sequential, zero-based integer keys).
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    public static function isList($array)
+    {
+        return array_values($array) === $array;
+    }
+
+    /**
+     * Determine if an array is associative (not a list).
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    public static function isAssoc($array)
+    {
+        return !static::isList($array);
+    }
+
+    /**
+     * Get one or a specified number of random values from an array.
+     *
+     * @param  array  $array
+     * @param  int|null  $number
+     * @param  bool  $preserveKeys
+     * @return mixed
+     */
+    public static function random($array, $number = null, $preserveKeys = false)
+    {
+        $requested = is_null($number) ? 1 : $number;
+
+        $count = count($array);
+
+        if ($requested > $count) {
+            throw new \InvalidArgumentException(
+                "You requested {$requested} items, but there are only {$count} items available."
+            );
+        }
+
+        if (is_null($number)) {
+            return $array[array_rand($array)];
+        }
+
+        if ((int) $number === 0) {
+            return array();
+        }
+
+        $keys = (array) array_rand($array, $number);
+
+        $results = array();
+
+        foreach ($keys as $key) {
+            if ($preserveKeys) {
+                $results[$key] = $array[$key];
+            } else {
+                $results[] = $array[$key];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Shuffle the given array and return the result.
+     *
+     * @param  array  $array
+     * @param  int|null  $seed
+     * @return array
+     */
+    public static function shuffle($array, $seed = null)
+    {
+        if (is_null($seed)) {
+            shuffle($array);
+        } else {
+            mt_srand($seed);
+            shuffle($array);
+            mt_srand();
+        }
+
+        return $array;
+    }
+
+    /**
+     * Sort the array using the given callback or "dot" notation key.
+     *
+     * @param  array  $array
+     * @param  callable|string|null  $callback
+     * @return array
+     */
+    public static function sort($array, $callback = null)
+    {
+        $items = $array;
+
+        if (is_null($callback)) {
+            asort($items);
+
+            return $items;
+        }
+
+        uasort($items, function ($a, $b) use ($callback) {
+            $aValue = is_callable($callback) ? call_user_func($callback, $a) : Objects::get($a, $callback);
+            $bValue = is_callable($callback) ? call_user_func($callback, $b) : Objects::get($b, $callback);
+
+            if ($aValue == $bValue) {
+                return 0;
+            }
+
+            return $aValue < $bValue ? -1 : 1;
+        });
+
+        return $items;
+    }
+
+    /**
+     * Sort the array in descending order using the given callback or "dot" notation key.
+     *
+     * @param  array  $array
+     * @param  callable|string|null  $callback
+     * @return array
+     */
+    public static function sortDesc($array, $callback = null)
+    {
+        if (is_null($callback)) {
+            $items = $array;
+
+            arsort($items);
+
+            return $items;
+        }
+
+        return array_reverse(static::sort($array, $callback), true);
+    }
+
+    /**
+     * Recursively sort an array by keys and values.
+     *
+     * @param  array  $array
+     * @param  int  $options
+     * @param  bool  $descending
+     * @return array
+     */
+    public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = static::sortRecursive($value, $options, $descending);
+            }
+        }
+
+        if (static::isList($array)) {
+            $descending ? rsort($array, $options) : sort($array, $options);
+        } else {
+            $descending ? krsort($array, $options) : ksort($array, $options);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Build a query string from the given array.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function query($array)
+    {
+        return http_build_query($array, '', '&');
+    }
+
+    /**
+     * Cross join the given arrays, returning all possible permutations.
+     *
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function crossJoin()
+    {
+        $arrays = func_get_args();
+
+        $results = array(array());
+
+        foreach ($arrays as $index => $array) {
+            $append = array();
+
+            foreach ($results as $product) {
+                foreach ($array as $item) {
+                    $product[$index] = $item;
+
+                    $append[] = $product;
+                }
+            }
+
+            $results = $append;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Partition the array into two arrays using the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    public static function partition($array, $callback)
+    {
+        $passed = array();
+
+        $failed = array();
+
+        foreach ($array as $key => $item) {
+            if (call_user_func($callback, $item, $key)) {
+                $passed[$key] = $item;
+            } else {
+                $failed[$key] = $item;
+            }
+        }
+
+        return array($passed, $failed);
+    }
+
+    /**
+     * Join all items using a string, with a final glue for the last item.
+     *
+     * @param  array  $array
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public static function join($array, $glue, $finalGlue = '')
+    {
+        if ($finalGlue === '') {
+            return implode($glue, $array);
+        }
+
+        $count = count($array);
+
+        if ($count === 0) {
+            return '';
+        }
+
+        if ($count === 1) {
+            return end($array);
+        }
+
+        $finalItem = array_pop($array);
+
+        return implode($glue, $array) . $finalGlue . $finalItem;
+    }
+
+    /**
+     * Take the first or last {$limit} items from an array.
+     *
+     * @param  array  $array
+     * @param  int  $limit
+     * @return array
+     */
+    public static function take($array, $limit)
+    {
+        if ($limit < 0) {
+            return array_slice($array, $limit, abs($limit));
+        }
+
+        return array_slice($array, 0, $limit);
+    }
+
+    /**
+     * Filter items where the value is not null.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    public static function whereNotNull($array)
+    {
+        return static::where($array, function ($value) {
+            return !is_null($value);
+        });
     }
 }

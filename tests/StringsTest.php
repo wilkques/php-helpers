@@ -348,4 +348,125 @@ class StringsTest extends TestCase
 
         $this->assertEquals(Strings::getClassBaseName($abstract), 'Objects');
     }
+
+    public function testUcfirst()
+    {
+        $this->assertEquals('Abc', Strings::ucfirst('abc'));
+
+        $this->assertEquals('Abc', Strings::ucfirst('Abc'));
+    }
+
+    public function testStudly()
+    {
+        $this->assertEquals('AbcEfg', Strings::studly('abc_efg'));
+
+        $this->assertEquals('AbcEfg', Strings::studly('abc-efg'));
+
+        $this->assertEquals('AbcEfg', Strings::studly('abc efg'));
+    }
+
+    public function testLimit()
+    {
+        $this->assertEquals('abc...', Strings::limit('abc efg hij', 3));
+
+        $this->assertEquals('abc efg hij', Strings::limit('abc efg hij', 100));
+
+        $this->assertEquals('abc***', Strings::limit('abc efg hij', 3, '***'));
+    }
+
+    public function testSlug()
+    {
+        $this->assertEquals('abc-efg', Strings::slug('abc efg'));
+
+        $this->assertEquals('abc_efg', Strings::slug('abc efg', '_'));
+
+        $this->assertEquals('abc-efg', Strings::slug('Abc Efg!!!'));
+    }
+
+    public function testMask()
+    {
+        $this->assertEquals('ab****gh', Strings::mask('abcdefgh', '*', 2, 4));
+
+        $this->assertEquals('abcd****', Strings::mask('abcdefgh', '*', 4));
+
+        $this->assertEquals('abcdef**', Strings::mask('abcdefgh', '*', -2));
+    }
+
+    public function testPadLeftRightBoth()
+    {
+        $this->assertEquals('__abc', Strings::padLeft('abc', 5, '_'));
+
+        $this->assertEquals('abc__', Strings::padRight('abc', 5, '_'));
+
+        $this->assertEquals('_abc_', Strings::padBoth('abc', 5, '_'));
+    }
+
+    public function testHeadline()
+    {
+        $this->assertEquals('Abc Efg', Strings::headline('abc_efg'));
+
+        $this->assertEquals('Abc Efg', Strings::headline('abcEfg'));
+
+        $this->assertEquals('Abc Efg', Strings::headline('abc-efg'));
+    }
+
+    public function testWordCount()
+    {
+        $this->assertEquals(2, Strings::wordCount('hello world'));
+    }
+
+    public function testIsUuid()
+    {
+        $this->assertTrue(Strings::isUuid('9f8f8f8f-1234-4321-abcd-1234567890ab'));
+
+        $this->assertFalse(Strings::isUuid('not-a-uuid'));
+
+        $this->assertFalse(Strings::isUuid(123));
+    }
+
+    public function testIsUlid()
+    {
+        $this->assertTrue(Strings::isUlid('01ARZ3NDEKTSV4RRFFQ69G5FAV'));
+
+        $this->assertFalse(Strings::isUlid('not-a-ulid'));
+
+        $this->assertFalse(Strings::isUlid(123));
+    }
+
+    public function testSquish()
+    {
+        $this->assertEquals('abc efg', Strings::squish('  abc   efg  '));
+    }
+
+    public function testPlural()
+    {
+        $this->assertEquals('cars', Strings::plural('car'));
+
+        $this->assertEquals('boxes', Strings::plural('box'));
+
+        $this->assertEquals('cities', Strings::plural('city'));
+
+        $this->assertEquals('leaves', Strings::plural('leaf'));
+
+        $this->assertEquals('knives', Strings::plural('knife'));
+
+        $this->assertEquals('children', Strings::plural('child'));
+
+        $this->assertEquals('car', Strings::plural('car', 1));
+    }
+
+    public function testSingular()
+    {
+        $this->assertEquals('car', Strings::singular('cars'));
+
+        $this->assertEquals('box', Strings::singular('boxes'));
+
+        $this->assertEquals('city', Strings::singular('cities'));
+
+        $this->assertEquals('leaf', Strings::singular('leaves'));
+
+        $this->assertEquals('knife', Strings::singular('knives'));
+
+        $this->assertEquals('child', Strings::singular('children'));
+    }
 }

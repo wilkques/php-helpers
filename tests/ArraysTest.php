@@ -1381,4 +1381,194 @@ class ArraysTest extends TestCase
             array()
         );
     }
+
+    public function testIsList()
+    {
+        $this->assertTrue(Arrays::isList(array(1, 2, 3)));
+
+        $this->assertFalse(Arrays::isList(array('abc' => 123)));
+
+        $this->assertFalse(Arrays::isList(array(1 => 'a', 0 => 'b')));
+
+        $this->assertTrue(Arrays::isList(array()));
+    }
+
+    public function testIsAssoc()
+    {
+        $this->assertFalse(Arrays::isAssoc(array(1, 2, 3)));
+
+        $this->assertTrue(Arrays::isAssoc(array('abc' => 123)));
+    }
+
+    public function testRandom()
+    {
+        $value = Arrays::random(array(1, 2, 3));
+
+        $this->assertTrue(in_array($value, array(1, 2, 3)));
+
+        $values = Arrays::random(array(1, 2, 3), 2);
+
+        $this->assertCount(2, $values);
+
+        foreach ($values as $value) {
+            $this->assertTrue(in_array($value, array(1, 2, 3)));
+        }
+
+        $values = Arrays::random(array('a' => 1, 'b' => 2), 2, true);
+
+        $this->assertEquals(array('a', 'b'), array_keys($values));
+    }
+
+    public function testShuffle()
+    {
+        $array = array(1, 2, 3, 4, 5);
+
+        $shuffled = Arrays::shuffle($array);
+
+        sort($shuffled);
+
+        $this->assertEquals($array, $shuffled);
+    }
+
+    public function testSort()
+    {
+        $this->assertEquals(
+            array(1, 2, 3),
+            array_values(Arrays::sort(array(3, 1, 2)))
+        );
+
+        $sorted = Arrays::sort(
+            array(
+                array('abc' => 3),
+                array('abc' => 1),
+                array('abc' => 2),
+            ),
+            'abc'
+        );
+
+        $this->assertEquals(
+            array(1, 2, 3),
+            array_values(Arrays::pluck($sorted, 'abc'))
+        );
+    }
+
+    public function testSortDesc()
+    {
+        $this->assertEquals(
+            array(3, 2, 1),
+            array_values(Arrays::sortDesc(array(1, 3, 2)))
+        );
+    }
+
+    public function testSortRecursive()
+    {
+        $this->assertEquals(
+            array(
+                'abc' => array(1, 2, 3),
+                'efg' => 456,
+            ),
+            Arrays::sortRecursive(
+                array(
+                    'efg' => 456,
+                    'abc' => array(3, 1, 2),
+                )
+            )
+        );
+    }
+
+    public function testQuery()
+    {
+        $this->assertEquals(
+            'abc=123&efg=456',
+            Arrays::query(array('abc' => 123, 'efg' => 456))
+        );
+    }
+
+    public function testCrossJoin()
+    {
+        $this->assertEquals(
+            array(
+                array(1, 'a'),
+                array(1, 'b'),
+                array(2, 'a'),
+                array(2, 'b'),
+            ),
+            Arrays::crossJoin(array(1, 2), array('a', 'b'))
+        );
+    }
+
+    public function testPartition()
+    {
+        list($passed, $failed) = Arrays::partition(
+            array(1, 2, 3, 4, 5),
+            function ($value) {
+                return $value % 2 === 0;
+            }
+        );
+
+        $this->assertEquals(array(2, 4), array_values($passed));
+
+        $this->assertEquals(array(1, 3, 5), array_values($failed));
+    }
+
+    public function testJoin()
+    {
+        $this->assertEquals(
+            'a, b, c',
+            Arrays::join(array('a', 'b', 'c'), ', ')
+        );
+
+        $this->assertEquals(
+            'a, b and c',
+            Arrays::join(array('a', 'b', 'c'), ', ', ' and ')
+        );
+
+        $this->assertEquals(
+            'a',
+            Arrays::join(array('a'), ', ', ' and ')
+        );
+    }
+
+    public function testTake()
+    {
+        $this->assertEquals(
+            array(1, 2),
+            Arrays::take(array(1, 2, 3, 4), 2)
+        );
+
+        $this->assertEquals(
+            array(3, 4),
+            array_values(Arrays::take(array(1, 2, 3, 4), -2))
+        );
+    }
+
+    public function testWhereNotNull()
+    {
+        $this->assertEquals(
+            array(0 => 1, 2 => 2),
+            Arrays::whereNotNull(array(1, null, 2))
+        );
+    }
+
+    public function testReduceWithInitial()
+    {
+        $this->assertEquals(
+            6,
+            Arrays::reduce(
+                array(1, 2, 3),
+                function ($carry, $item) {
+                    return $carry + $item;
+                },
+                0
+            )
+        );
+    }
+
+    public function testFilterWithNonClosureCallable()
+    {
+        $this->assertEquals(
+            array(0 => 1, 2 => 3),
+            Arrays::filter(array(1, 0, 3), 'intval')
+        );
+    }
 }

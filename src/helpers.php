@@ -1,6 +1,7 @@
 <?php
 
 use Wilkques\Helpers\Arrays;
+use Wilkques\Helpers\Collections;
 use Wilkques\Helpers\Objects;
 use Wilkques\Helpers\Strings;
 
@@ -39,7 +40,7 @@ if (!function_exists('array_pluck')) {
      * 
      * @return array
      */
-    function array_pluck($array, string $value, string $key = null, int $case = null)
+    function array_pluck($array, $value, $key = null, $case = null)
     {
        return Arrays::pluck($array, $value, $key, $case);
     }
@@ -473,6 +474,20 @@ if (!function_exists("array_key_kebab_case_to_camel")) {
     }
 }
 
+if (!function_exists("array_column")) {
+    /**
+     * @param  array  $array
+     * @param int|string $columnKey
+     * @param int|string|null $indexKey
+     * 
+     * @return array
+     */
+    function array_column($array, $columnKey, $indexKey = null)
+    {
+        return Arrays::column($array, $columnKey, $indexKey);
+    }
+}
+
 if (!function_exists("str_kebab_case_to_camel")) {
     /**
      * @param  string  $string
@@ -512,13 +527,427 @@ if (!function_exists("str_snake_to_camel")) {
 if (!function_exists("str_camel")) {
     /**
      * replace snake & kebab case to camel
-     * 
+     *
      * @param  string  $string
-     * 
+     *
      * @return string
      */
     function str_camel($string)
     {
         return Strings::camel($string);
+    }
+}
+
+if (!function_exists("array_is_list")) {
+    /**
+     * Determine if an array is a list (sequential, zero-based integer keys).
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    function array_is_list($array)
+    {
+        return Arrays::isList($array);
+    }
+}
+
+if (!function_exists("array_is_assoc")) {
+    /**
+     * Determine if an array is associative (not a list).
+     *
+     * @param  array  $array
+     * @return bool
+     */
+    function array_is_assoc($array)
+    {
+        return Arrays::isAssoc($array);
+    }
+}
+
+if (!function_exists("array_random")) {
+    /**
+     * Get one or a specified number of random values from an array.
+     *
+     * @param  array  $array
+     * @param  int|null  $number
+     * @param  bool  $preserveKeys
+     * @return mixed
+     */
+    function array_random($array, $number = null, $preserveKeys = false)
+    {
+        return Arrays::random($array, $number, $preserveKeys);
+    }
+}
+
+if (!function_exists("array_shuffle")) {
+    /**
+     * Shuffle the given array and return the result.
+     *
+     * @param  array  $array
+     * @param  int|null  $seed
+     * @return array
+     */
+    function array_shuffle($array, $seed = null)
+    {
+        return Arrays::shuffle($array, $seed);
+    }
+}
+
+if (!function_exists("array_sort")) {
+    /**
+     * Sort the array using the given callback or "dot" notation key.
+     *
+     * @param  array  $array
+     * @param  callable|string|null  $callback
+     * @return array
+     */
+    function array_sort($array, $callback = null)
+    {
+        return Arrays::sort($array, $callback);
+    }
+}
+
+if (!function_exists("array_sort_desc")) {
+    /**
+     * Sort the array in descending order using the given callback or "dot" notation key.
+     *
+     * @param  array  $array
+     * @param  callable|string|null  $callback
+     * @return array
+     */
+    function array_sort_desc($array, $callback = null)
+    {
+        return Arrays::sortDesc($array, $callback);
+    }
+}
+
+if (!function_exists("array_sort_recursive")) {
+    /**
+     * Recursively sort an array by keys and values.
+     *
+     * @param  array  $array
+     * @param  int  $options
+     * @param  bool  $descending
+     * @return array
+     */
+    function array_sort_recursive($array, $options = SORT_REGULAR, $descending = false)
+    {
+        return Arrays::sortRecursive($array, $options, $descending);
+    }
+}
+
+if (!function_exists("array_query")) {
+    /**
+     * Build a query string from the given array.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    function array_query($array)
+    {
+        return Arrays::query($array);
+    }
+}
+
+if (!function_exists("array_cross_join")) {
+    /**
+     * Cross join the given arrays, returning all possible permutations.
+     *
+     * @param  array  ...$arrays
+     * @return array
+     */
+    function array_cross_join()
+    {
+        return call_user_func_array(array('Wilkques\Helpers\Arrays', 'crossJoin'), func_get_args());
+    }
+}
+
+if (!function_exists("array_partition")) {
+    /**
+     * Partition the array into two arrays using the given callback.
+     *
+     * @param  array  $array
+     * @param  callable  $callback
+     * @return array
+     */
+    function array_partition($array, $callback)
+    {
+        return Arrays::partition($array, $callback);
+    }
+}
+
+if (!function_exists("array_join")) {
+    /**
+     * Join all items using a string, with a final glue for the last item.
+     *
+     * @param  array  $array
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    function array_join($array, $glue, $finalGlue = '')
+    {
+        return Arrays::join($array, $glue, $finalGlue);
+    }
+}
+
+if (!function_exists("array_take")) {
+    /**
+     * Take the first or last {$limit} items from an array.
+     *
+     * @param  array  $array
+     * @param  int  $limit
+     * @return array
+     */
+    function array_take($array, $limit)
+    {
+        return Arrays::take($array, $limit);
+    }
+}
+
+if (!function_exists("array_where_not_null")) {
+    /**
+     * Filter items where the value is not null.
+     *
+     * @param  array  $array
+     * @return array
+     */
+    function array_where_not_null($array)
+    {
+        return Arrays::whereNotNull($array);
+    }
+}
+
+if (!function_exists("str_random")) {
+    /**
+     * Generate a random string of the given length.
+     *
+     * @param  int  $length
+     * @return string
+     */
+    function str_random($length)
+    {
+        return Strings::rand($length);
+    }
+}
+
+if (!function_exists("class_basename")) {
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param  string|object  $class
+     * @return string
+     */
+    function class_basename($class)
+    {
+        return Strings::getClassBaseName($class);
+    }
+}
+
+if (!function_exists("str_ucfirst")) {
+    /**
+     * Make a string's first character uppercase (multibyte-safe).
+     *
+     * @param  string  $string
+     * @return string
+     */
+    function str_ucfirst($string)
+    {
+        return Strings::ucfirst($string);
+    }
+}
+
+if (!function_exists("str_studly")) {
+    /**
+     * Convert a value to studly caps case (PascalCase).
+     *
+     * @param  string  $string
+     * @return string
+     */
+    function str_studly($string)
+    {
+        return Strings::studly($string);
+    }
+}
+
+if (!function_exists("str_limit")) {
+    /**
+     * Limit the number of characters in a string.
+     *
+     * @param  string  $value
+     * @param  int  $limit
+     * @param  string  $end
+     * @return string
+     */
+    function str_limit($value, $limit = 100, $end = '...')
+    {
+        return Strings::limit($value, $limit, $end);
+    }
+}
+
+if (!function_exists("str_slug")) {
+    /**
+     * Generate a URL friendly "slug" from a given string.
+     *
+     * @param  string  $title
+     * @param  string  $separator
+     * @return string
+     */
+    function str_slug($title, $separator = '-')
+    {
+        return Strings::slug($title, $separator);
+    }
+}
+
+if (!function_exists("str_mask")) {
+    /**
+     * Masks a portion of a string with a repeated character.
+     *
+     * @param  string  $string
+     * @param  string  $character
+     * @param  int  $index
+     * @param  int|null  $length
+     * @return string
+     */
+    function str_mask($string, $character, $index, $length = null)
+    {
+        return Strings::mask($string, $character, $index, $length);
+    }
+}
+
+if (!function_exists("str_pad_left")) {
+    /**
+     * Pad the left side of a string with another.
+     *
+     * @param  string  $value
+     * @param  int  $length
+     * @param  string  $pad
+     * @return string
+     */
+    function str_pad_left($value, $length, $pad = ' ')
+    {
+        return Strings::padLeft($value, $length, $pad);
+    }
+}
+
+if (!function_exists("str_pad_right")) {
+    /**
+     * Pad the right side of a string with another.
+     *
+     * @param  string  $value
+     * @param  int  $length
+     * @param  string  $pad
+     * @return string
+     */
+    function str_pad_right($value, $length, $pad = ' ')
+    {
+        return Strings::padRight($value, $length, $pad);
+    }
+}
+
+if (!function_exists("str_pad_both")) {
+    /**
+     * Pad both sides of a string with another.
+     *
+     * @param  string  $value
+     * @param  int  $length
+     * @param  string  $pad
+     * @return string
+     */
+    function str_pad_both($value, $length, $pad = ' ')
+    {
+        return Strings::padBoth($value, $length, $pad);
+    }
+}
+
+if (!function_exists("str_headline")) {
+    /**
+     * Convert the given string to title case for each word, separated by spaces.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function str_headline($value)
+    {
+        return Strings::headline($value);
+    }
+}
+
+if (!function_exists("str_is_uuid")) {
+    /**
+     * Determine if a given value is a valid UUID.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function str_is_uuid($value)
+    {
+        return Strings::isUuid($value);
+    }
+}
+
+if (!function_exists("str_is_ulid")) {
+    /**
+     * Determine if a given value is a valid ULID.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function str_is_ulid($value)
+    {
+        return Strings::isUlid($value);
+    }
+}
+
+if (!function_exists("str_squish")) {
+    /**
+     * Remove all "extra" blank space from the given string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function str_squish($value)
+    {
+        return Strings::squish($value);
+    }
+}
+
+if (!function_exists("str_plural")) {
+    /**
+     * Get the plural form of an English word.
+     *
+     * @param  string  $value
+     * @param  int  $count
+     * @return string
+     */
+    function str_plural($value, $count = 2)
+    {
+        return Strings::plural($value, $count);
+    }
+}
+
+if (!function_exists("str_singular")) {
+    /**
+     * Get the singular form of an English word.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function str_singular($value)
+    {
+        return Strings::singular($value);
+    }
+}
+
+if (!function_exists("collect")) {
+    /**
+     * Create a collection from the given value.
+     *
+     * @param  mixed  $items
+     * @return \Wilkques\Helpers\Collections
+     */
+    function collect($items = array())
+    {
+        return new Collections($items);
     }
 }
