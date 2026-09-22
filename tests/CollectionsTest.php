@@ -75,11 +75,15 @@ class CollectionsTest extends TestCase
 
     public function testIsEmpty()
     {
-        $this->assertTrue((new Collections())->isEmpty());
+        $empty = new Collections();
 
-        $this->assertFalse((new Collections())->isNotEmpty());
+        $this->assertTrue($empty->isEmpty());
 
-        $this->assertTrue((new Collections(array(1)))->isNotEmpty());
+        $this->assertFalse($empty->isNotEmpty());
+
+        $notEmpty = new Collections(array(1));
+
+        $this->assertTrue($notEmpty->isNotEmpty());
     }
 
     public function testMapDoesNotMutateOriginal()
@@ -279,9 +283,13 @@ class CollectionsTest extends TestCase
 
         $keyed = $collection->keyBy('id');
 
-        $this->assertEquals('a', $keyed->get(1)['name']);
+        $first = $keyed->get(1);
 
-        $this->assertEquals('b', $keyed->get(2)['name']);
+        $second = $keyed->get(2);
+
+        $this->assertEquals('a', $first['name']);
+
+        $this->assertEquals('b', $second['name']);
     }
 
     public function testImplode()
