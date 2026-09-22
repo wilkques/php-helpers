@@ -3,6 +3,8 @@
 [![Latest Stable Version](https://poser.pugx.org/wilkques/php-helper/v/stable)](https://packagist.org/packages/wilkques/php-helper)
 [![License](https://poser.pugx.org/wilkques/php-helper/license)](https://packagist.org/packages/wilkques/php-helper)
 
+English | [繁體中文](README_ZH.md)
+
 A dependency-free collection of Laravel-flavoured array, string and collection helpers for PHP, written to stay compatible all the way back to **PHP 5.3**.
 
 ## Requirements
