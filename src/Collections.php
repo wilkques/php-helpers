@@ -428,7 +428,13 @@ class Collections implements \ArrayAccess, \Countable, \IteratorAggregate
      */
     public function reduce($callback, $initial = null)
     {
-        return Arrays::reduce($this->items, $callback, $initial);
+        $result = $initial;
+
+        foreach ($this->items as $key => $value) {
+            $result = call_user_func($callback, $result, $value, $key);
+        }
+
+        return $result;
     }
 
     /**
@@ -478,7 +484,7 @@ class Collections implements \ArrayAccess, \Countable, \IteratorAggregate
     public function contains($key, $value = null)
     {
         if (func_num_args() === 1) {
-            if (is_callable($key)) {
+            if (!is_string($key) && is_callable($key)) {
                 foreach ($this->items as $itemKey => $item) {
                     if (call_user_func($key, $item, $itemKey)) {
                         return true;

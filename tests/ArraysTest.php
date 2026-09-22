@@ -91,11 +91,11 @@ class ArraysTest extends TestCase
         $this->assertEquals(
             $array,
             array(
-                array(
+                'abcEfg' => array(
                     123,
                     'abcEfg',
                 ),
-                array(
+                'hijKlm' => array(
                     456,
                     'hijKlm',
                 ),
@@ -536,6 +536,11 @@ class ArraysTest extends TestCase
 
         // Test the mock object
         $this->assertTrue(Arrays::exists($mock, 'abc'));
+
+        // float keys are cast to string before the array_key_exists()
+        // lookup, matching how PHP itself casts a float array key to int
+        // (via string) when it's actually stored as a key.
+        $this->assertTrue(Arrays::exists(array('1.5' => 'x'), 1.5));
     }
 
     public function testIsIterable()
@@ -1445,6 +1450,10 @@ class ArraysTest extends TestCase
         $values = Arrays::random(array('a' => 1, 'b' => 2), 2, true);
 
         $this->assertEquals(array('a', 'b'), array_keys($values));
+
+        $this->assertEquals(array(), Arrays::random(array(1, 2, 3), 0));
+
+        $this->assertEquals(array(), Arrays::random(array(1, 2, 3), -1));
     }
 
     public function testShuffle()
@@ -1509,6 +1518,16 @@ class ArraysTest extends TestCase
         $this->assertEquals(
             'abc=123&efg=456',
             Arrays::query(array('abc' => 123, 'efg' => 456))
+        );
+
+        // RFC3986 (spaces as %20) from PHP 5.4 up; RFC1738 (spaces as +)
+        // is all PHP 5.3 has, since the encoding-type argument itself
+        // doesn't exist there yet.
+        $expectedSpace = defined('PHP_QUERY_RFC3986') ? '%20' : '+';
+
+        $this->assertEquals(
+            'name=John' . $expectedSpace . 'Doe',
+            Arrays::query(array('name' => 'John Doe'))
         );
     }
 
@@ -1598,5 +1617,60 @@ class ArraysTest extends TestCase
             array(0 => 1, 2 => 3),
             Arrays::filter(array(1, 0, 3), 'intval')
         );
+    }
+
+    public function testForgetDescendsThroughArrayAccessMidPath()
+    {
+        $inner = new ArraysTestArrayAccessFixture(array('efg' => 456));
+
+        $array = array('abc' => $inner);
+
+        Arrays::forget($array, 'abc.efg');
+
+        $this->assertFalse($inner->offsetExists('efg'));
+    }
+}
+
+/**
+ * Minimal real (not mocked) ArrayAccess implementation — Arrays::forget()
+ * needs to isset()/unset() through it and take a reference to one of its
+ * offsets, none of which the method()/willReturn() mock builder used
+ * elsewhere in this file can express.
+ */
+class ArraysTestArrayAccessFixture implements \ArrayAccess
+{
+    protected $items;
+
+    public function __construct($items = array())
+    {
+        $this->items = $items;
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
+    {
+        return isset($this->items[$offset]);
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        return $this->items[$offset];
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
+    {
+        if (is_null($offset)) {
+            $this->items[] = $value;
+        } else {
+            $this->items[$offset] = $value;
+        }
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
+    {
+        unset($this->items[$offset]);
     }
 }

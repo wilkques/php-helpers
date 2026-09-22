@@ -126,6 +126,10 @@ class Objects
             return $array->offsetExists($key);
         }
 
+        if (is_float($key)) {
+            $key = (string) $key;
+        }
+
         return array_key_exists($key, $array);
     }
 

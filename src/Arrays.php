@@ -40,7 +40,11 @@ class Arrays
      */
     public static function map($array, $callback = null)
     {
-        return array_map($callback, $array, array_keys($array));
+        $keys = array_keys($array);
+
+        $items = array_map($callback, $array, $keys);
+
+        return array_combine($keys, $items);
     }
 
     /**
@@ -259,6 +263,10 @@ class Arrays
     {
         if ($array instanceof \ArrayAccess) {
             return $array->offsetExists($key);
+        }
+
+        if (is_float($key)) {
+            $key = (string) $key;
         }
 
         return array_key_exists($key, $array);
@@ -502,7 +510,7 @@ class Arrays
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && is_array($array[$part])) {
+                if (isset($array[$part]) && static::accessible($array[$part])) {
                     $array = &$array[$part];
                 } else {
                     continue 2;
@@ -864,12 +872,12 @@ class Arrays
             );
         }
 
-        if (is_null($number)) {
-            return $array[array_rand($array)];
+        if (empty($array) || (!is_null($number) && $number <= 0)) {
+            return is_null($number) ? null : array();
         }
 
-        if ((int) $number === 0) {
-            return array();
+        if (is_null($number)) {
+            return $array[array_rand($array)];
         }
 
         $keys = (array) array_rand($array, $number);
@@ -991,6 +999,14 @@ class Arrays
      */
     public static function query($array)
     {
+        // PHP_QUERY_RFC3986 (and the 4th http_build_query() argument that
+        // takes it) only exist from PHP 5.4 — calling with a 4th argument
+        // on 5.3 raises a "wrong parameter count" warning. Falls back to
+        // the 3-arg RFC1738 default (spaces encoded as "+") there.
+        if (defined('PHP_QUERY_RFC3986')) {
+            return http_build_query($array, '', '&', PHP_QUERY_RFC3986);
+        }
+
         return http_build_query($array, '', '&');
     }
 

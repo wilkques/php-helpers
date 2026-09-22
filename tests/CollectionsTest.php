@@ -315,6 +315,21 @@ class CollectionsTest extends TestCase
         }, 0));
     }
 
+    public function testReducePassesKeyToCallback()
+    {
+        $collection = new Collections(array('a' => 1, 'b' => 2));
+
+        $seenKeys = array();
+
+        $collection->reduce(function ($carry, $item, $key) use (&$seenKeys) {
+            $seenKeys[] = $key;
+
+            return $carry + $item;
+        }, 0);
+
+        $this->assertEquals(array('a', 'b'), $seenKeys);
+    }
+
     public function testEach()
     {
         $collection = new Collections(array(1, 2, 3));
@@ -364,6 +379,18 @@ class CollectionsTest extends TestCase
         $this->assertTrue($collection->contains('name', 'a'));
 
         $this->assertFalse($collection->contains('name', 'b'));
+    }
+
+    public function testContainsWithPlainStringDoesNotTreatItAsCallable()
+    {
+        // 'strlen' is_callable() === true (resolves to the global
+        // function), but contains() must still search for it as a literal
+        // value, not invoke it as a predicate.
+        $collection = new Collections(array('strlen', 'trim'));
+
+        $this->assertTrue($collection->contains('strlen'));
+
+        $this->assertFalse($collection->contains('nope'));
     }
 
     public function testGetHasSetForgetPull()
