@@ -2,6 +2,17 @@
 
 All notable changes to this package will be documented in this file.
 
+## [6.0.1]
+
+### Fixed
+
+- `Collections::count()`, `getIterator()`, `offsetExists()`, `offsetGet()`, `offsetSet()`, `offsetUnset()` no longer trigger a PHP 8.1+ deprecation notice (added `#[\ReturnTypeWillChange]`, which parses as a harmless comment on PHP < 8.0, confirmed on real PHP 5.3.10 — same pattern already used by `wilkques/filesystem`).
+
+### Documentation
+
+- Added a Traditional Chinese README (`README_ZH.md`).
+- Every documented `Arrays`/`Strings`/`Objects`/`Collections` method now has a verified, runnable inline example.
+
 ## [6.0.0]
 
 ### Added
