@@ -1116,6 +1116,34 @@ class ArraysTest extends TestCase
         );
     }
 
+    public function testMerge()
+    {
+        $this->assertEquals(
+            Arrays::merge(
+                array('/a', '/b'),
+                array('/c', '/d')
+            ),
+            array('/a', '/b', '/c', '/d')
+        );
+
+        $this->assertEquals(
+            Arrays::merge(
+                array('/a', '/b'),
+                array('/c'),
+                array('/d')
+            ),
+            array('/a', '/b', '/c', '/d')
+        );
+
+        $this->assertEquals(
+            Arrays::merge(
+                array('abc' => 123, 'efg' => 456),
+                array('efg' => 789)
+            ),
+            array('abc' => 123, 'efg' => 789)
+        );
+    }
+
     public function testFirst()
     {
         $this->assertEquals(

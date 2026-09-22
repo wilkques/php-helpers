@@ -547,9 +547,9 @@ class Arrays
     }
 
     /**
-     * Replace the collection items with the given items.
+     * Replace the array items with the given items.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  ...$replacements
+     * @param  array  ...$arrays
      * @return array
      */
     public static function replace()
@@ -560,9 +560,9 @@ class Arrays
     }
 
     /**
-     * Recursively replace the collection items with the given items.
+     * Recursively replace the array items with the given items.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable<TKey, TValue>|iterable<TKey, TValue>  ...$replacements
+     * @param  array  ...$arrays
      * @return array
      */
     public static function replaceRecursive()
@@ -570,6 +570,19 @@ class Arrays
         $args = func_get_args();
 
         return call_user_func_array('array_replace_recursive', $args);
+    }
+
+    /**
+     * Merge one or more arrays together.
+     *
+     * @param  array  ...$arrays
+     * @return array
+     */
+    public static function merge()
+    {
+        $args = func_get_args();
+
+        return call_user_func_array('array_merge', $args);
     }
 
     /**

@@ -8,7 +8,7 @@ class Strings
      * Common English irregular plural forms.
      *
      * Note: this is a small, hand-picked rule set for common cases only,
-     * it is not a full inflector like Laravel's (which relies on doctrine/inflector).
+     * it is not a full inflector.
      *
      * @var array
      */
@@ -289,9 +289,9 @@ class Strings
     /**
      * Generate a URL friendly "slug" from a given string.
      *
-     * Note: unlike Laravel's Str::slug, this does not transliterate
-     * accented/non-latin characters to ASCII, it relies on PCRE unicode
-     * properties (\pL/\pN) to keep letters/numbers of any script.
+     * Note: this does not transliterate accented/non-latin characters to
+     * ASCII, it relies on PCRE unicode properties (\pL/\pN) to keep
+     * letters/numbers of any script.
      *
      * @param  string  $title
      * @param  string  $separator
@@ -491,7 +491,7 @@ class Strings
      * Get the plural form of an English word.
      *
      * Note: covers common regular/irregular cases only, it is not a full
-     * inflector like Laravel's (which relies on doctrine/inflector).
+     * inflector.
      *
      * @param  string  $value
      * @param  int  $count
@@ -528,7 +528,7 @@ class Strings
      * Get the singular form of an English word.
      *
      * Note: covers common regular/irregular cases only, it is not a full
-     * inflector like Laravel's (which relies on doctrine/inflector).
+     * inflector.
      *
      * @param  string  $value
      * @return string
