@@ -5,7 +5,7 @@
 
 [English](README.md) | 繁體中文
 
-一個無外部相依、風格參考 Laravel 的 PHP 陣列／字串／集合輔助函式庫，並保持與 **PHP 5.3** 相容。
+一個無外部相依的 PHP 陣列／字串／集合輔助函式庫，並保持與 **PHP 5.3** 相容。
 
 ## 需求
 
@@ -19,7 +19,7 @@ composer require wilkques/php-helper
 
 ## 使用方式
 
-所有功能都放在 `Wilkques\Helpers` 命名空間下：三個靜態輔助類別（`Arrays`、`Strings`、`Objects`）、一個可實例化的 `Collections` 類別，以及一組全域函式（透過 `src/helpers.php` 自動載入），這些全域函式只是薄薄包一層呼叫對應的類別方法——對應的是 Laravel `Arr::*` / `Str::*` / `array_*` / `str_*` / `data_*` 這種 helper 拆分方式。
+所有功能都放在 `Wilkques\Helpers` 命名空間下：三個靜態輔助類別（`Arrays`、`Strings`、`Objects`）、一個可實例化的 `Collections` 類別，以及一組全域函式（透過 `src/helpers.php` 自動載入），這些全域函式只是薄薄包一層呼叫對應的類別方法——分成類別方法（`Arrays::*` / `Strings::*`）跟全域函式（`array_*` / `str_*` / `data_*`）兩種呼叫方式。
 
 ```php
 use Wilkques\Helpers\Arrays;
@@ -95,7 +95,7 @@ data_get($config, 'db.host');
 
 ### Collections
 
-`collect()`（或 `new Collections($items)`）可以把陣列、JSON 字串、`Traversable`、或 `JsonSerializable` 包裝成一個可鏈式呼叫、每次操作都回傳新實例（immutable-per-call）的 collection——實作了 `Countable`、`IteratorAggregate`、`ArrayAccess`，用法很接近 Laravel 的 `Collection`。
+`collect()`（或 `new Collections($items)`）可以把陣列、JSON 字串、`Traversable`、或 `JsonSerializable` 包裝成一個可鏈式呼叫、每次操作都回傳新實例（immutable-per-call）的 collection——實作了 `Countable`、`IteratorAggregate`、`ArrayAccess`。
 
 ```php
 $total = collect([1, 2, 3, 4])
@@ -109,7 +109,7 @@ foreach (collect(['a' => 1, 'b' => 2]) as $key => $value) {
 }
 ```
 
-轉換類方法（`map`、`filter`、`reject`、`pluck`、`sortBy`、`groupBy`、`chunk`……）都會回傳**新的** `Collections` 實例，不會動到原本的集合——跟 Laravel 行為一致。只有明確標示為 mutating 的方法（`push`、`put`、`set`、`forget`、`pull`、`prepend`）才會直接修改當前集合。
+轉換類方法（`map`、`filter`、`reject`、`pluck`、`sortBy`、`groupBy`、`chunk`……）都會回傳**新的** `Collections` 實例，不會動到原本的集合。只有明確標示為 mutating 的方法（`push`、`put`、`set`、`forget`、`pull`、`prepend`）才會直接修改當前集合。
 
 ```php
 $people = collect([
@@ -142,7 +142,7 @@ $cart->all(); // ['total' => 100, 'currency' => 'USD']
 
 ### `Wilkques\Helpers\Arrays`
 
-支援 dot notation 的陣列輔助方法，大致對應 Laravel 的 `Illuminate\Support\Arr`。
+支援 dot notation 的陣列輔助方法。
 
 | 方法 | 說明 | 範例 |
 | --- | --- | --- |
@@ -199,7 +199,7 @@ $cart->all(); // ['total' => 100, 'currency' => 'USD']
 
 ### `Wilkques\Helpers\Strings`
 
-大致對應 Laravel 的 `Illuminate\Support\Str`，底層使用 `mb_*` 函式，支援多位元組字串。
+底層使用 `mb_*` 函式，支援多位元組字串。
 
 | 方法 | 說明 | 範例 |
 | --- | --- | --- |

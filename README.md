@@ -5,7 +5,7 @@
 
 English | [繁體中文](README_ZH.md)
 
-A dependency-free collection of Laravel-flavoured array, string and collection helpers for PHP, written to stay compatible all the way back to **PHP 5.3**.
+A dependency-free collection of array, string, and collection helpers for PHP, written to stay compatible all the way back to **PHP 5.3**.
 
 ## Requirements
 
@@ -19,7 +19,7 @@ composer require wilkques/php-helper
 
 ## Usage
 
-Everything lives under the `Wilkques\Helpers` namespace as static helper classes (`Arrays`, `Strings`, `Objects`), one instantiable `Collections` class, and a set of global functions (auto-loaded via `src/helpers.php`) that thinly wrap those classes — mirroring Laravel's `Arr::*` / `Str::*` / `array_*` / `str_*` / `data_*` helper split.
+Everything lives under the `Wilkques\Helpers` namespace as static helper classes (`Arrays`, `Strings`, `Objects`), one instantiable `Collections` class, and a set of global functions (auto-loaded via `src/helpers.php`) that thinly wrap those classes — a class-method (`Arrays::*` / `Strings::*`) plus global-function (`array_*` / `str_*` / `data_*`) split.
 
 ```php
 use Wilkques\Helpers\Arrays;
@@ -95,7 +95,7 @@ data_get($config, 'db.host');
 
 ### Collections
 
-`collect()` (or `new Collections($items)`) wraps an array, JSON string, `Traversable`, or `JsonSerializable` into a chainable, immutable-per-call collection — implementing `Countable`, `IteratorAggregate` and `ArrayAccess`, similar to Laravel's `Collection`.
+`collect()` (or `new Collections($items)`) wraps an array, JSON string, `Traversable`, or `JsonSerializable` into a chainable, immutable-per-call collection — implementing `Countable`, `IteratorAggregate` and `ArrayAccess`.
 
 ```php
 $total = collect([1, 2, 3, 4])
@@ -109,7 +109,7 @@ foreach (collect(['a' => 1, 'b' => 2]) as $key => $value) {
 }
 ```
 
-Transformation methods (`map`, `filter`, `reject`, `pluck`, `sortBy`, `groupBy`, `chunk`, ...) return a **new** `Collections` instance and never mutate the original — the same as Laravel. Only the explicitly mutating methods (`push`, `put`, `set`, `forget`, `pull`, `prepend`) modify the collection in place.
+Transformation methods (`map`, `filter`, `reject`, `pluck`, `sortBy`, `groupBy`, `chunk`, ...) return a **new** `Collections` instance and never mutate the original. Only the explicitly mutating methods (`push`, `put`, `set`, `forget`, `pull`, `prepend`) modify the collection in place.
 
 ```php
 $people = collect([
@@ -142,7 +142,7 @@ Every method below has a runnable example (verified on PHP 7.4 and on real PHP 5
 
 ### `Wilkques\Helpers\Arrays`
 
-Dot-notation aware array helpers, largely mirroring Laravel's `Illuminate\Support\Arr`.
+Dot-notation aware array helpers.
 
 | Method | Description | Example |
 | --- | --- | --- |
@@ -199,7 +199,7 @@ Dot-notation aware array helpers, largely mirroring Laravel's `Illuminate\Suppor
 
 ### `Wilkques\Helpers\Strings`
 
-Mirrors much of Laravel's `Illuminate\Support\Str`, multibyte-safe (`mb_*` under the hood).
+Multibyte-safe string helpers (`mb_*` under the hood).
 
 | Method | Description | Example |
 | --- | --- | --- |

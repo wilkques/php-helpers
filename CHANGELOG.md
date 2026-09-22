@@ -32,7 +32,7 @@ All notable changes to this package will be documented in this file.
 
 ### Changed
 
-- **Breaking:** `Collections` transformation methods (`map`, `filter`, `reject`, `pluck`, `sortBy`, `groupBy`, `chunk`, ...) now return a **new** `Collections` instance instead of mutating and returning `$this`, matching Laravel's `Collection` semantics. Only the explicitly mutating methods (`push`, `put`, `set`, `forget`, `pull`, `prepend`) still modify the collection in place.
+- **Breaking:** `Collections` transformation methods (`map`, `filter`, `reject`, `pluck`, `sortBy`, `groupBy`, `chunk`, ...) now return a **new** `Collections` instance instead of mutating and returning `$this`. Only the explicitly mutating methods (`push`, `put`, `set`, `forget`, `pull`, `prepend`) still modify the collection in place.
 
 ---
 
