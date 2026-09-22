@@ -8,10 +8,10 @@ use Wilkques\Helpers\Strings;
 if (!function_exists('str_snake')) {
     /**
      * @param string $camelCase
-     * 
+     *
      * @return array|string|null
      */
-    function string_snake($camelCase)
+    function str_snake($camelCase)
     {
         return Strings::snake($camelCase);
     }
