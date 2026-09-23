@@ -372,6 +372,14 @@ class StringsTest extends TestCase
         $this->assertEquals('abc efg hij', Strings::limit('abc efg hij', 100));
 
         $this->assertEquals('abc***', Strings::limit('abc efg hij', 3, '***'));
+
+        // Limit counts display width, not character count, so a
+        // full-width (CJK) character counts as 2 toward the limit.
+        $this->assertEquals('这是一...', Strings::limit('这是一段中文', 6));
+
+        $this->assertEquals('这是一', Strings::limit('这是一段中文', 6, ''));
+
+        $this->assertEquals('The PHP', Strings::limit('The PHP framework for web artisans.', 7, ''));
     }
 
     public function testSlug()
@@ -399,6 +407,21 @@ class StringsTest extends TestCase
         $this->assertEquals('abc__', Strings::padRight('abc', 5, '_'));
 
         $this->assertEquals('_abc_', Strings::padBoth('abc', 5, '_'));
+
+        // str_pad() counts bytes, not characters — a multibyte string
+        // whose byte length already exceeds the target got zero padding
+        // even though its character count was well under it.
+        $this->assertEquals('***你好', Strings::padLeft('你好', 5, '*'));
+
+        $this->assertEquals('你好***', Strings::padRight('你好', 5, '*'));
+
+        $this->assertEquals('  ❤MultiByte☆   ', Strings::padBoth('❤MultiByte☆', 16));
+
+        $this->assertEquals('❤☆❤MultiByte☆❤☆❤', Strings::padBoth('❤MultiByte☆', 16, '❤☆'));
+
+        $this->assertEquals('❤☆❤☆❤❤MultiByte☆', Strings::padLeft('❤MultiByte☆', 16, '❤☆'));
+
+        $this->assertEquals('❤MultiByte☆❤☆❤☆❤', Strings::padRight('❤MultiByte☆', 16, '❤☆'));
     }
 
     public function testHeadline()
@@ -436,6 +459,18 @@ class StringsTest extends TestCase
     public function testSquish()
     {
         $this->assertEquals('abc efg', Strings::squish('  abc   efg  '));
+
+        // Hangul filler codepoints (U+3164/U+1160) render as blank but
+        // aren't matched by \s, so they must be collapsed explicitly too.
+        $this->assertEquals(
+            'laravel php framework',
+            Strings::squish("laravel\xE3\x85\xA4\xE3\x85\xA4\xE3\x85\xA4php\xE3\x85\xA4framework")
+        );
+
+        $this->assertEquals(
+            'laravel php framework',
+            Strings::squish("laravel\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0php\xE1\x85\xA0\xE1\x85\xA0framework")
+        );
     }
 
     public function testPlural()

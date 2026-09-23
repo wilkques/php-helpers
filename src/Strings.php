@@ -272,6 +272,10 @@ class Strings
     /**
      * Limit the number of characters in a string.
      *
+     * Uses display width (mb_strwidth/mb_strimwidth), not character count,
+     * so a full-width (e.g. CJK) character counts as 2 toward the limit,
+     * matching Laravel's Str::limit().
+     *
      * @param  string  $value
      * @param  int  $limit
      * @param  string  $end
@@ -279,11 +283,11 @@ class Strings
      */
     public static function limit($value, $limit = 100, $end = '...')
     {
-        if (mb_strlen($value, 'UTF-8') <= $limit) {
+        if (mb_strwidth($value, 'UTF-8') <= $limit) {
             return $value;
         }
 
-        return rtrim(mb_substr($value, 0, $limit, 'UTF-8')) . $end;
+        return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')) . $end;
     }
 
     /**
@@ -353,6 +357,11 @@ class Strings
     /**
      * Pad both sides of a string with another.
      *
+     * str_pad() counts bytes, not characters, so a multibyte $value whose
+     * byte length already exceeds $length gets no padding at all even
+     * though its character length is under it. Pads by character count
+     * instead (mb_strlen/mb_substr), matching Laravel's Str::padBoth().
+     *
      * @param  string  $value
      * @param  int  $length
      * @param  string  $pad
@@ -360,7 +369,13 @@ class Strings
      */
     public static function padBoth($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_BOTH);
+        $short = max(0, $length - mb_strlen($value, 'UTF-8'));
+        $shortLeft = (int) floor($short / 2);
+        $shortRight = (int) ceil($short / 2);
+
+        return mb_substr(str_repeat($pad, $shortLeft), 0, $shortLeft, 'UTF-8')
+            . $value
+            . mb_substr(str_repeat($pad, $shortRight), 0, $shortRight, 'UTF-8');
     }
 
     /**
@@ -373,7 +388,9 @@ class Strings
      */
     public static function padLeft($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_LEFT);
+        $short = max(0, $length - mb_strlen($value, 'UTF-8'));
+
+        return mb_substr(str_repeat($pad, $short), 0, $short, 'UTF-8') . $value;
     }
 
     /**
@@ -386,7 +403,9 @@ class Strings
      */
     public static function padRight($value, $length, $pad = ' ')
     {
-        return str_pad($value, $length, $pad, STR_PAD_RIGHT);
+        $short = max(0, $length - mb_strlen($value, 'UTF-8'));
+
+        return $value . mb_substr(str_repeat($pad, $short), 0, $short, 'UTF-8');
     }
 
     /**
@@ -459,12 +478,16 @@ class Strings
     /**
      * Remove all "extra" blank space from the given string.
      *
+     * Also collapses the Hangul filler codepoints U+3164/U+1160, which
+     * render as blank but aren't matched by \s, matching Laravel's
+     * Str::squish().
+     *
      * @param  string  $value
      * @return string
      */
     public static function squish($value)
     {
-        return trim(preg_replace('/\s+/u', ' ', $value));
+        return trim(preg_replace('/(\s|\x{3164}|\x{1160})+/u', ' ', $value));
     }
 
     /**

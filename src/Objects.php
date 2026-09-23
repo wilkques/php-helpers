@@ -98,10 +98,10 @@ class Objects
                     $result[] = static::get($item, $key);
                 }
 
-                return $result;
+                return in_array('*', $key) ? Arrays::collapse($result) : $result;
             }
 
-            if (is_array($target) && array_key_exists($segment, $target)) {
+            if (static::accessible($target) && Arrays::exists($target, $segment)) {
                 $target = $target[$segment];
             } elseif (is_object($target) && isset($target->{$segment})) {
                 $target = $target->{$segment};

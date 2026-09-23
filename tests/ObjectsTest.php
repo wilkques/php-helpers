@@ -56,6 +56,67 @@ class ObjectsTest extends TestCase
         $this->assertEquals($value, null);
     }
 
+    public function testGetTraversesArrayAccess()
+    {
+        $inner = new ObjectsTestArrayAccessFixture(array('name' => 'John'));
+
+        $outer = new ObjectsTestArrayAccessFixture(array('price' => 56, 'user' => $inner, 'email' => null));
+
+        $this->assertEquals(56, Objects::get($outer, 'price'));
+
+        $this->assertEquals('John', Objects::get($outer, 'user.name'));
+
+        $this->assertEquals('void', Objects::get($outer, 'foo', 'void'));
+
+        $this->assertEquals('void', Objects::get($outer, 'user.foo', 'void'));
+
+        $this->assertNull(Objects::get($outer, 'email', 'Not found'));
+    }
+
+    public function testGetWithNestedWildcards()
+    {
+        $array = array(
+            'users' => array(
+                array('first' => 'taylor', 'email' => 'taylor@example.com'),
+                array('first' => 'abigail'),
+                array('first' => 'dayle'),
+            ),
+        );
+
+        $this->assertEquals(array('taylor', 'abigail', 'dayle'), Objects::get($array, 'users.*.first'));
+
+        $this->assertEquals(array('taylor@example.com', null, null), Objects::get($array, 'users.*.email', 'irrelevant'));
+    }
+
+    public function testGetWithDoubleNestedWildcardCollapsesResult()
+    {
+        $array = array(
+            'posts' => array(
+                array(
+                    'comments' => array(
+                        array('author' => 'taylor', 'likes' => 4),
+                        array('author' => 'abigail', 'likes' => 3),
+                    ),
+                ),
+                array(
+                    'comments' => array(
+                        array('author' => 'dayle'),
+                    ),
+                ),
+            ),
+        );
+
+        $this->assertEquals(
+            array('taylor', 'abigail', 'dayle'),
+            Objects::get($array, 'posts.*.comments.*.author')
+        );
+
+        $this->assertEquals(
+            array(4, 3, null),
+            Objects::get($array, 'posts.*.comments.*.likes')
+        );
+    }
+
     public function testExists()
     {
         $array = array(
@@ -104,6 +165,11 @@ class ObjectsTest extends TestCase
 
         // Test the mock object
         $this->assertTrue(Objects::exists($mock, 'abc'));
+
+        // float keys are cast to string before the array_key_exists()
+        // lookup, matching how PHP itself casts a float array key to int
+        // (via string) when it's actually stored as a key.
+        $this->assertTrue(Objects::exists(array('1.5' => 'x'), 1.5));
     }
 
     public function testValue()
@@ -146,5 +212,49 @@ class ObjectsTest extends TestCase
         $this->assertThat(Objects::value(function ($string) {
             return $string;
         }, ''), $this->isType('string'));
+    }
+}
+
+/**
+ * Minimal real (not mocked) ArrayAccess implementation — Objects::get()
+ * needs to isset()/offsetExists()/offsetGet() through it recursively,
+ * which the method()/willReturn() mock builder used elsewhere in this
+ * file can't express.
+ */
+class ObjectsTestArrayAccessFixture implements \ArrayAccess
+{
+    protected $items;
+
+    public function __construct($items = array())
+    {
+        $this->items = $items;
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
+    {
+        return isset($this->items[$offset]) || array_key_exists($offset, $this->items);
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        return $this->items[$offset];
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
+    {
+        if (is_null($offset)) {
+            $this->items[] = $value;
+        } else {
+            $this->items[$offset] = $value;
+        }
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
+    {
+        unset($this->items[$offset]);
     }
 }
