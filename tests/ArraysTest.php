@@ -438,6 +438,22 @@ class ArraysTest extends TestCase
         $this->assertEquals($value, null);
     }
 
+    public function testGetWithDottedKey()
+    {
+        $array = array('user' => array('profile' => array('name' => 'Wilkques')));
+
+        $this->assertEquals('Wilkques', Arrays::get($array, 'user.profile.name'));
+
+        $this->assertEquals(
+            'Not found',
+            Arrays::get($array, 'user.profile.email', 'Not found')
+        );
+
+        $this->assertNull(Arrays::get($array, 'user.missing.name'));
+
+        $this->assertNull(Arrays::get($array, 'user.profile.name.too.deep'));
+    }
+
     public function testAccessible()
     {
         $this->assertTrue(
