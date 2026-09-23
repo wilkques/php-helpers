@@ -117,6 +117,97 @@ class ObjectsTest extends TestCase
         );
     }
 
+    public function testGetFirstLastDirectives()
+    {
+        $array = array('one', 'two', 'three');
+
+        $this->assertEquals('one', Objects::get($array, '{first}'));
+
+        $this->assertEquals('three', Objects::get($array, '{last}'));
+    }
+
+    public function testGetFirstLastDirectivesOnKeyedArraysFollowInsertionOrder()
+    {
+        $array = array('a' => 1, 'z' => 2, 'm' => 3);
+
+        $this->assertEquals(1, Objects::get($array, '{first}'));
+
+        $this->assertEquals(3, Objects::get($array, '{last}'));
+    }
+
+    public function testGetFirstLastDirectivesOnArrayAccessIterable()
+    {
+        $fixture = new ObjectsTestArrayAccessIterableFixture(array('one', 'two', 'three'));
+
+        $this->assertEquals('one', Objects::get($fixture, '{first}'));
+
+        $this->assertEquals('three', Objects::get($fixture, '{last}'));
+    }
+
+    public function testGetEscapedSegmentKeys()
+    {
+        $array = array(
+            'symbols' => array(
+                '{last}' => array('description' => 'dollar'),
+                '*' => array('description' => 'asterisk'),
+                '{first}' => array('description' => 'caret'),
+            ),
+        );
+
+        $this->assertEquals('caret', Objects::get($array, 'symbols.\{first}.description'));
+
+        $this->assertEquals('asterisk', Objects::get($array, 'symbols.\*.description'));
+
+        $this->assertEquals('dollar', Objects::get($array, 'symbols.\{last}.description'));
+
+        $this->assertEquals(
+            array('dollar', 'asterisk', 'caret'),
+            Objects::get($array, 'symbols.*.description')
+        );
+    }
+
+    public function testGetFirstLastDirectiveInsertionOrderEdgeCase()
+    {
+        // Insertion order is {last}, *, {first} — the UNESCAPED {first}
+        // directive must resolve to the first-INSERTED key ('{last}'),
+        // and the unescaped {last} directive to the last-inserted key
+        // ('{first}'), regardless of what those keys are literally named.
+        $array = array(
+            'symbols' => array(
+                '{last}' => array('description' => 'dollar'),
+                '*' => array('description' => 'asterisk'),
+                '{first}' => array('description' => 'caret'),
+            ),
+        );
+
+        $this->assertEquals('dollar', Objects::get($array, 'symbols.{first}.description'));
+
+        $this->assertEquals('caret', Objects::get($array, 'symbols.{last}.description'));
+    }
+
+    public function testGetFirstLastDirectiveOnEmptyArrayReturnsDefault()
+    {
+        $this->assertEquals('default', Objects::get(array(), '{first}', 'default'));
+
+        $this->assertEquals('default', Objects::get(array(), '{last}', 'default'));
+    }
+
+    public function testGetFirstLastDirectiveNested()
+    {
+        $array = array(
+            'flights' => array(
+                array('segments' => array(
+                    array('from' => 'LHR'),
+                    array('from' => 'IST'),
+                )),
+            ),
+        );
+
+        $this->assertEquals('LHR', Objects::get($array, 'flights.0.segments.{first}.from'));
+
+        $this->assertEquals('IST', Objects::get($array, 'flights.0.segments.{last}.from'));
+    }
+
     public function testExists()
     {
         $array = array(
@@ -256,5 +347,53 @@ class ObjectsTestArrayAccessFixture implements \ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->items[$offset]);
+    }
+}
+
+/**
+ * ArrayAccess + IteratorAggregate fixture — exercises Objects::get()'s
+ * normalizeForKeyLookup() Traversable branch for {first}/{last}.
+ */
+class ObjectsTestArrayAccessIterableFixture implements \ArrayAccess, \IteratorAggregate
+{
+    protected $items;
+
+    public function __construct($items = array())
+    {
+        $this->items = $items;
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetExists($offset)
+    {
+        return isset($this->items[$offset]);
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        return $this->items[$offset];
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetSet($offset, $value)
+    {
+        if (is_null($offset)) {
+            $this->items[] = $value;
+        } else {
+            $this->items[$offset] = $value;
+        }
+    }
+
+    #[\ReturnTypeWillChange]
+    public function offsetUnset($offset)
+    {
+        unset($this->items[$offset]);
+    }
+
+    #[\ReturnTypeWillChange]
+    public function getIterator()
+    {
+        return new \ArrayIterator($this->items);
     }
 }

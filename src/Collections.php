@@ -2,6 +2,15 @@
 
 namespace Wilkques\Helpers;
 
+// SORT_NATURAL/SORT_FLAG_CASE were only added in PHP 5.4.0.
+if (!defined('SORT_NATURAL')) {
+    define('SORT_NATURAL', 6);
+}
+
+if (!defined('SORT_FLAG_CASE')) {
+    define('SORT_FLAG_CASE', 8);
+}
+
 class Collections implements \ArrayAccess, \Countable, \IteratorAggregate
 {
     /**
@@ -322,23 +331,169 @@ class Collections implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @param callable|string $callback
+     * @param callable|string|array $callback A single key/callable, or an
+     *  array of them (optionally as [key, 'asc'|'desc'] pairs) for
+     *  multi-column sorting with tie-breaking.
+     * @param int $options One of the SORT_* flags.
+     * @param bool $descending
      *
      * @return static
      */
-    public function sortBy($callback)
+    public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
-        return $this->sort($callback);
+        if (is_array($callback) && !is_callable($callback)) {
+            return $this->sortByMany($callback, $options);
+        }
+
+        $decorated = array();
+        $sequence = 0;
+
+        foreach ($this->items as $key => $value) {
+            $sortValue = is_callable($callback) ? call_user_func($callback, $value, $key) : Objects::get($value, $callback);
+
+            $decorated[] = array('key' => $key, 'value' => $value, 'sort' => $sortValue, 'seq' => $sequence);
+
+            $sequence++;
+        }
+
+        $that = $this;
+
+        usort($decorated, function ($a, $b) use ($that, $options, $descending) {
+            $result = $that->compareSortValues($a['sort'], $b['sort'], $options);
+
+            if ($descending) {
+                $result = -$result;
+            }
+
+            if ($result === 0) {
+                return $a['seq'] < $b['seq'] ? -1 : 1;
+            }
+
+            return $result;
+        });
+
+        $results = array();
+
+        foreach ($decorated as $item) {
+            $results[$item['key']] = $item['value'];
+        }
+
+        return new static($results);
     }
 
     /**
-     * @param callable|string $callback
+     * Sort by multiple [key, direction] comparisons, falling through to the
+     * next comparison whenever the previous one ties. Ties across every
+     * comparison break on original position, so the result is stable
+     * regardless of whether the running PHP version's sort() is (PHP's own
+     * sort stability was only guaranteed starting with PHP 8.0.0, and this
+     * package supports PHP 5.3+).
+     *
+     * @param array $comparisons
+     * @param int $options
      *
      * @return static
      */
-    public function sortByDesc($callback)
+    protected function sortByMany($comparisons = array(), $options = SORT_REGULAR)
     {
-        return $this->sortDesc($callback);
+        $decorated = array();
+        $sequence = 0;
+
+        foreach ($this->items as $key => $value) {
+            $decorated[] = array('key' => $key, 'value' => $value, 'seq' => $sequence);
+
+            $sequence++;
+        }
+
+        $that = $this;
+
+        usort($decorated, function ($a, $b) use ($that, $comparisons, $options) {
+            foreach ($comparisons as $comparison) {
+                $comparison = Arrays::wrap($comparison);
+
+                $prop = $comparison[0];
+
+                $ascending = !isset($comparison[1]) || $comparison[1] === true || $comparison[1] === 'asc';
+
+                if (!is_string($prop) && is_callable($prop)) {
+                    $result = call_user_func($prop, $a['value'], $b['value']);
+                } else {
+                    $result = $that->compareSortValues(Objects::get($a['value'], $prop), Objects::get($b['value'], $prop), $options);
+
+                    if (!$ascending) {
+                        $result = -$result;
+                    }
+                }
+
+                if ($result === 0) {
+                    continue;
+                }
+
+                return $result;
+            }
+
+            return $a['seq'] < $b['seq'] ? -1 : 1;
+        });
+
+        $results = array();
+
+        foreach ($decorated as $item) {
+            $results[$item['key']] = $item['value'];
+        }
+
+        return new static($results);
+    }
+
+    /**
+     * @param mixed $aValue
+     * @param mixed $bValue
+     * @param int $options One of the SORT_* flags.
+     *
+     * @return int -1, 0, or 1
+     */
+    public function compareSortValues($aValue, $bValue, $options)
+    {
+        if (($options & SORT_FLAG_CASE) === SORT_FLAG_CASE) {
+            return (($options & SORT_NATURAL) === SORT_NATURAL)
+                ? strnatcasecmp($aValue, $bValue)
+                : strcasecmp($aValue, $bValue);
+        }
+
+        switch ($options) {
+            case SORT_NUMERIC:
+                $left = intval($aValue);
+                $right = intval($bValue);
+                return $left == $right ? 0 : ($left < $right ? -1 : 1);
+            case SORT_STRING:
+                return strcmp($aValue, $bValue);
+            case SORT_NATURAL:
+                return strnatcmp((string) $aValue, (string) $bValue);
+            case SORT_LOCALE_STRING:
+                return strcoll($aValue, $bValue);
+            default:
+                return $aValue == $bValue ? 0 : ($aValue < $bValue ? -1 : 1);
+        }
+    }
+
+    /**
+     * @param callable|string|array $callback
+     * @param int $options
+     *
+     * @return static
+     */
+    public function sortByDesc($callback, $options = SORT_REGULAR)
+    {
+        if (is_array($callback) && !is_callable($callback)) {
+            foreach ($callback as $index => $key) {
+                $comparison = Arrays::wrap($key);
+                $comparison[1] = 'desc';
+                $callback[$index] = $comparison;
+            }
+
+            return $this->sortByMany($callback, $options);
+        }
+
+        return $this->sortBy($callback, $options, true);
     }
 
     /**
@@ -362,27 +517,57 @@ class Collections implements \ArrayAccess, \Countable, \IteratorAggregate
     }
 
     /**
-     * @param callable|string $groupBy
+     * Group by a single key/callable, or by an array of them for
+     * multi-level nested grouping (each level's retriever may also return
+     * an array of group keys, putting a single item into multiple groups).
+     *
+     * Does not special-case enum/Stringable group keys (PHP 8.1+ concepts,
+     * not applicable at this package's PHP 5.3 floor); pass a callable
+     * that returns a plain scalar for those cases instead.
+     *
+     * @param callable|string|array $groupBy
+     * @param bool $preserveKeys
      *
      * @return static
      */
-    public function groupBy($groupBy)
+    public function groupBy($groupBy, $preserveKeys = false)
     {
+        $nextGroups = array();
+
+        if (!is_callable($groupBy) && is_array($groupBy)) {
+            $nextGroups = $groupBy;
+            $groupBy = array_shift($nextGroups);
+        }
+
         $results = array();
 
         foreach ($this->items as $key => $value) {
-            $groupKey = is_callable($groupBy) ? call_user_func($groupBy, $value, $key) : Objects::get($value, $groupBy);
+            $groupKeys = is_callable($groupBy) ? call_user_func($groupBy, $value, $key) : Objects::get($value, $groupBy);
 
-            $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
-
-            if (!array_key_exists($groupKey, $results)) {
-                $results[$groupKey] = new static();
+            if (!is_array($groupKeys)) {
+                $groupKeys = array($groupKeys);
             }
 
-            $results[$groupKey]->push($value);
+            foreach ($groupKeys as $groupKey) {
+                $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
+
+                if (!array_key_exists($groupKey, $results)) {
+                    $results[$groupKey] = new static();
+                }
+
+                $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
+            }
         }
 
-        return new static($results);
+        $result = new static($results);
+
+        if (!empty($nextGroups)) {
+            return $result->map(function ($group) use ($nextGroups, $preserveKeys) {
+                return $group->groupBy($nextGroups, $preserveKeys);
+            });
+        }
+
+        return $result;
     }
 
     /**

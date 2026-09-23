@@ -244,6 +244,126 @@ class CollectionsTest extends TestCase
         $this->assertEquals(array(3, 2, 1), array_values($sortedDesc->pluck('abc')->all()));
     }
 
+    public function testSortByMultiColumnArray()
+    {
+        $collection = new Collections(array(
+            array('last' => 'b', 'first' => 'z'),
+            array('last' => 'a', 'first' => 'y'),
+            array('last' => 'a', 'first' => 'x'),
+        ));
+
+        $sorted = $collection->sortBy(array('last', 'first'));
+
+        $this->assertEquals(
+            array(
+                array('last' => 'a', 'first' => 'x'),
+                array('last' => 'a', 'first' => 'y'),
+                array('last' => 'b', 'first' => 'z'),
+            ),
+            array_values($sorted->all())
+        );
+    }
+
+    public function testSortByMultiColumnWithDirection()
+    {
+        $collection = new Collections(array(
+            array('age' => 30, 'name' => 'b'),
+            array('age' => 30, 'name' => 'a'),
+            array('age' => 20, 'name' => 'c'),
+        ));
+
+        $sorted = $collection->sortBy(array(array('age', 'desc'), 'name'));
+
+        $this->assertEquals(
+            array(
+                array('age' => 30, 'name' => 'a'),
+                array('age' => 30, 'name' => 'b'),
+                array('age' => 20, 'name' => 'c'),
+            ),
+            array_values($sorted->all())
+        );
+    }
+
+    public function testSortBySingleElementArrayRoutesToMultiColumn()
+    {
+        $collection = new Collections(array(
+            array('item' => '1'),
+            array('item' => '10'),
+            array('item' => 5),
+            array('item' => 20),
+        ));
+
+        $expected = $collection->pluck('item')->all();
+        sort($expected);
+
+        $sorted = $collection->sortBy(array('item'));
+
+        $this->assertEquals($expected, array_values($sorted->pluck('item')->all()));
+    }
+
+    public function testSortByWithCallableComparisonEntry()
+    {
+        $collection = new Collections(array(
+            array('value' => 3),
+            array('value' => 1),
+            array('value' => 2),
+        ));
+
+        $sorted = $collection->sortBy(array(function ($a, $b) {
+            return $a['value'] < $b['value'] ? -1 : ($a['value'] == $b['value'] ? 0 : 1);
+        }));
+
+        $this->assertEquals(array(1, 2, 3), array_values($sorted->pluck('value')->all()));
+    }
+
+    public function testSortByNumericAndStringOptions()
+    {
+        $collection = new Collections(array(
+            array('v' => '10'),
+            array('v' => '9'),
+            array('v' => '2'),
+        ));
+
+        $numeric = array_values($collection->sortBy('v', SORT_NUMERIC)->pluck('v')->all());
+
+        $this->assertEquals(array('2', '9', '10'), $numeric);
+
+        $string = array_values($collection->sortBy('v', SORT_STRING)->pluck('v')->all());
+
+        $this->assertEquals(array('10', '2', '9'), $string);
+    }
+
+    public function testSortByDescMultiColumn()
+    {
+        $collection = new Collections(array(
+            array('score' => 1, 'name' => 'b'),
+            array('score' => 2, 'name' => 'a'),
+        ));
+
+        $sorted = $collection->sortByDesc(array('score', 'name'));
+
+        $this->assertEquals(
+            array(
+                array('score' => 2, 'name' => 'a'),
+                array('score' => 1, 'name' => 'b'),
+            ),
+            array_values($sorted->all())
+        );
+    }
+
+    public function testSortByDescPreservesOriginalOrderOnTies()
+    {
+        $collection = new Collections(array(
+            array('k' => 1, 'id' => 'x'),
+            array('k' => 1, 'id' => 'y'),
+            array('k' => 2, 'id' => 'z'),
+        ));
+
+        $sorted = $collection->sortByDesc('k');
+
+        $this->assertEquals(array('z', 'x', 'y'), array_values($sorted->pluck('id')->all()));
+    }
+
     public function testChunk()
     {
         $collection = new Collections(array(1, 2, 3, 4, 5));
@@ -272,6 +392,110 @@ class CollectionsTest extends TestCase
         $this->assertEquals(array(1, 3), array_values($grouped->get('a')->pluck('value')->all()));
 
         $this->assertEquals(array(2), array_values($grouped->get('b')->pluck('value')->all()));
+    }
+
+    public function testGroupByWithCallableReturningArrayOfKeys()
+    {
+        $collection = new Collections(array(
+            array('id' => 1, 'roles' => array('a', 'b')),
+            array('id' => 2, 'roles' => array('a')),
+        ));
+
+        $grouped = $collection->groupBy(function ($item) {
+            return $item['roles'];
+        });
+
+        $this->assertEquals(array(1, 2), array_values($grouped->get('a')->pluck('id')->all()));
+
+        $this->assertEquals(array(1), array_values($grouped->get('b')->pluck('id')->all()));
+    }
+
+    public function testGroupByBoolKeyCastToInt()
+    {
+        $collection = new Collections(array(
+            array('active' => true, 'id' => 1),
+            array('active' => false, 'id' => 2),
+        ));
+
+        $grouped = $collection->groupBy('active');
+
+        $this->assertEquals(array(1), array_values($grouped->get(1)->pluck('id')->all()));
+
+        $this->assertEquals(array(2), array_values($grouped->get(0)->pluck('id')->all()));
+    }
+
+    public function testGroupByMultiLevel()
+    {
+        $collection = new Collections(array(
+            array('type' => 'a', 'value' => 1),
+            array('type' => 'a', 'value' => 2),
+            array('type' => 'b', 'value' => 1),
+        ));
+
+        $grouped = $collection->groupBy(array('type', 'value'));
+
+        $this->assertEquals(array(1), array_values($grouped->get('a')->get(1)->pluck('value')->all()));
+
+        $this->assertEquals(array(2), array_values($grouped->get('a')->get(2)->pluck('value')->all()));
+
+        $this->assertEquals(array(1), array_values($grouped->get('b')->get(1)->pluck('value')->all()));
+    }
+
+    public function testGroupByPreserveKeys()
+    {
+        $collection = new Collections(array(
+            10 => array('type' => 'a'),
+            20 => array('type' => 'a'),
+            30 => array('type' => 'b'),
+        ));
+
+        $grouped = $collection->groupBy('type', true);
+
+        $this->assertEquals(array(10, 20), array_keys($grouped->get('a')->all()));
+
+        $this->assertEquals(array(30), array_keys($grouped->get('b')->all()));
+    }
+
+    public function testGroupByMultiLevelWithArrayReturningCallbackAtSecondLevel()
+    {
+        $data = new Collections(array(
+            10 => array('user' => 1, 'skilllevel' => 1, 'roles' => array('Role_1', 'Role_3')),
+            20 => array('user' => 2, 'skilllevel' => 1, 'roles' => array('Role_1', 'Role_2')),
+            30 => array('user' => 3, 'skilllevel' => 2, 'roles' => array('Role_1')),
+            40 => array('user' => 4, 'skilllevel' => 2, 'roles' => array('Role_2')),
+        ));
+
+        $result = $data->groupBy(array(
+            'skilllevel',
+            function ($item) {
+                return $item['roles'];
+            },
+        ), true);
+
+        $this->assertEquals(
+            array(10, 20),
+            array_keys($result->get(1)->get('Role_1')->all())
+        );
+
+        $this->assertEquals(
+            array(10),
+            array_keys($result->get(1)->get('Role_3')->all())
+        );
+
+        $this->assertEquals(
+            array(20),
+            array_keys($result->get(1)->get('Role_2')->all())
+        );
+
+        $this->assertEquals(
+            array(30),
+            array_keys($result->get(2)->get('Role_1')->all())
+        );
+
+        $this->assertEquals(
+            array(40),
+            array_keys($result->get(2)->get('Role_2')->all())
+        );
     }
 
     public function testKeyBy()

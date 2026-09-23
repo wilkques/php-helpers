@@ -101,6 +101,18 @@ class Objects
                 return in_array('*', $key) ? Arrays::collapse($result) : $result;
             }
 
+            if ($segment === '\*') {
+                $segment = '*';
+            } elseif ($segment === '\{first}') {
+                $segment = '{first}';
+            } elseif ($segment === '{first}') {
+                $segment = static::arrayKeyFirst(static::normalizeForKeyLookup($target));
+            } elseif ($segment === '\{last}') {
+                $segment = '{last}';
+            } elseif ($segment === '{last}') {
+                $segment = static::arrayKeyLast(static::normalizeForKeyLookup($target));
+            }
+
             if (static::accessible($target) && Arrays::exists($target, $segment)) {
                 $target = $target[$segment];
             } elseif (is_object($target) && isset($target->{$segment})) {
@@ -158,5 +170,54 @@ class Objects
     public static function accessible($value)
     {
         return is_array($value) || $value instanceof \ArrayAccess;
+    }
+
+    /**
+     * Normalize a get() target into a plain array so its first/last key
+     * can be read, without depending on Collections (which itself depends
+     * on this class).
+     *
+     * @param  mixed  $target
+     * @return array
+     */
+    protected static function normalizeForKeyLookup($target)
+    {
+        if (is_array($target)) {
+            return $target;
+        }
+
+        if ($target instanceof \Traversable) {
+            return iterator_to_array($target);
+        }
+
+        return (array) $target;
+    }
+
+    /**
+     * PHP 5.3-safe replacement for array_key_first() (PHP 7.3+). The
+     * $array parameter is passed by value, so moving its internal pointer
+     * here has no effect on the caller's copy.
+     *
+     * @param  array  $array
+     * @return int|string|null
+     */
+    protected static function arrayKeyFirst($array)
+    {
+        reset($array);
+
+        return key($array);
+    }
+
+    /**
+     * PHP 5.3-safe replacement for array_key_last() (PHP 7.3+).
+     *
+     * @param  array  $array
+     * @return int|string|null
+     */
+    protected static function arrayKeyLast($array)
+    {
+        end($array);
+
+        return key($array);
     }
 }
