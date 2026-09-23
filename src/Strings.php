@@ -273,8 +273,7 @@ class Strings
      * Limit the number of characters in a string.
      *
      * Uses display width (mb_strwidth/mb_strimwidth), not character count,
-     * so a full-width (e.g. CJK) character counts as 2 toward the limit,
-     * matching Laravel's Str::limit().
+     * so a full-width (e.g. CJK) character counts as 2 toward the limit.
      *
      * @param  string  $value
      * @param  int  $limit
@@ -360,7 +359,7 @@ class Strings
      * str_pad() counts bytes, not characters, so a multibyte $value whose
      * byte length already exceeds $length gets no padding at all even
      * though its character length is under it. Pads by character count
-     * instead (mb_strlen/mb_substr), matching Laravel's Str::padBoth().
+     * instead (mb_strlen/mb_substr).
      *
      * @param  string  $value
      * @param  int  $length
@@ -479,8 +478,7 @@ class Strings
      * Remove all "extra" blank space from the given string.
      *
      * Also collapses the Hangul filler codepoints U+3164/U+1160, which
-     * render as blank but aren't matched by \s, matching Laravel's
-     * Str::squish().
+     * render as blank but aren't matched by \s.
      *
      * @param  string  $value
      * @return string
