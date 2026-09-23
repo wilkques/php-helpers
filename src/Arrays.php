@@ -223,11 +223,7 @@ class Arrays
         }
 
         if (!Strings::contains($key, '.')) {
-            if (static::exists($array, $key)) {
-                return static::get($array, $key);
-            }
-
-            return  static::value($default);
+            return static::value($default);
         }
 
         foreach (explode('.', $key) as $segment) {

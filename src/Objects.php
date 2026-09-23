@@ -101,16 +101,23 @@ class Objects
                 return in_array('*', $key) ? Arrays::collapse($result) : $result;
             }
 
-            if ($segment === '\*') {
-                $segment = '*';
-            } elseif ($segment === '\{first}') {
-                $segment = '{first}';
-            } elseif ($segment === '{first}') {
-                $segment = static::arrayKeyFirst(static::normalizeForKeyLookup($target));
-            } elseif ($segment === '\{last}') {
-                $segment = '{last}';
-            } elseif ($segment === '{last}') {
-                $segment = static::arrayKeyLast(static::normalizeForKeyLookup($target));
+            // Every {first}/{last}/escaped form starts with '\' or '{'; this
+            // single cheap check skips the 5-way comparison below for the
+            // overwhelmingly common case of an ordinary segment.
+            $firstChar = substr($segment, 0, 1);
+
+            if ($firstChar === '\\' || $firstChar === '{') {
+                if ($segment === '\*') {
+                    $segment = '*';
+                } elseif ($segment === '\{first}') {
+                    $segment = '{first}';
+                } elseif ($segment === '{first}') {
+                    $segment = static::arrayKeyFirst(static::normalizeForKeyLookup($target));
+                } elseif ($segment === '\{last}') {
+                    $segment = '{last}';
+                } elseif ($segment === '{last}') {
+                    $segment = static::arrayKeyLast(static::normalizeForKeyLookup($target));
+                }
             }
 
             if (static::accessible($target) && Arrays::exists($target, $segment)) {
