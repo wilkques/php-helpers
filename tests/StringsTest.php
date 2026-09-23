@@ -463,13 +463,13 @@ class StringsTest extends TestCase
         // Hangul filler codepoints (U+3164/U+1160) render as blank but
         // aren't matched by \s, so they must be collapsed explicitly too.
         $this->assertEquals(
-            'laravel php framework',
-            Strings::squish("laravel\xE3\x85\xA4\xE3\x85\xA4\xE3\x85\xA4php\xE3\x85\xA4framework")
+            'hello php world',
+            Strings::squish("hello\xE3\x85\xA4\xE3\x85\xA4\xE3\x85\xA4php\xE3\x85\xA4world")
         );
 
         $this->assertEquals(
-            'laravel php framework',
-            Strings::squish("laravel\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0php\xE1\x85\xA0\xE1\x85\xA0framework")
+            'hello php world',
+            Strings::squish("hello\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0\xE1\x85\xA0php\xE1\x85\xA0\xE1\x85\xA0world")
         );
     }
 
