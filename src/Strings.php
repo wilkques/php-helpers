@@ -556,9 +556,13 @@ class Strings
      */
     public static function singular($value)
     {
-        $lower = static::lower($value);
+        static $flipped = null;
 
-        $flipped = array_flip(static::$irregular);
+        if ($flipped === null) {
+            $flipped = array_flip(static::$irregular);
+        }
+
+        $lower = static::lower($value);
 
         if (isset($flipped[$lower])) {
             return static::matchCase($flipped[$lower], $value);

@@ -207,6 +207,19 @@ class CollectionsTest extends TestCase
         $this->assertEquals(array(0, 2), array_keys($unique->all()));
     }
 
+    public function testUniqueDistinguishesIntAndStringTypes()
+    {
+        $collection = new Collections(array(
+            array('id' => 5),
+            array('id' => '5'),
+            array('id' => 5),
+        ));
+
+        $unique = $collection->unique('id');
+
+        $this->assertEquals(array(0, 1), array_keys($unique->all()));
+    }
+
     public function testFlattenAndCollapse()
     {
         $collection = new Collections(array('abc' => 1, array(2, 3)));

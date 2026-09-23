@@ -372,24 +372,40 @@ class Arrays
      */
     public static function fields($array, $sort)
     {
-        uasort($array, function ($a, $b) use ($sort) {
-            $indexA = array_search($a, $sort);
+        $index = array();
 
-            $indexB = array_search($b, $sort);
-
-            if ($indexA === false && $indexB === false) {
-                return 0; // 如果兩個元素都不在排序陣列中，則視為相等
-            } elseif ($indexA === false) {
-                return 1; // 如果 $a 不在排序陣列中，則視 $b 為更小的元素
-            } elseif ($indexB === false) {
-                return -1; // 如果 $b 不在排序陣列中，則視 $a 為更小的元素
+        foreach ($sort as $i => $value) {
+            if (!isset($index[$value])) {
+                $index[$value] = $i;
             }
+        }
 
-            // 如果兩個元素都在排序陣列中，則比較它們在排序陣列中的索引位置
-            return $indexA < $indexB ? -1 : ($indexA > $indexB ? 1 : 0);
-        });
+        $buckets = array();
+        $notFound = array();
 
-        return $array;
+        foreach ($array as $key => $value) {
+            if (isset($index[$value])) {
+                $buckets[$index[$value]][$key] = $value;
+            } else {
+                $notFound[$key] = $value;
+            }
+        }
+
+        ksort($buckets);
+
+        $result = array();
+
+        foreach ($buckets as $bucket) {
+            foreach ($bucket as $k => $v) {
+                $result[$k] = $v;
+            }
+        }
+
+        foreach ($notFound as $k => $v) {
+            $result[$k] = $v;
+        }
+
+        return $result;
     }
 
     /**
@@ -657,15 +673,28 @@ class Arrays
     {
         $results = array();
 
+        static::dotInto($results, $array, $prepend);
+
+        return $results;
+    }
+
+    /**
+     * Flatten a multi-dimensional associative array with dots into the given results array by reference.
+     *
+     * @param  array  $results
+     * @param  iterable  $array
+     * @param  string  $prepend
+     * @return void
+     */
+    protected static function dotInto(&$results, $array, $prepend = '')
+    {
         foreach ($array as $key => $value) {
             if (is_array($value) && !empty($value)) {
-                $results = array_merge($results, static::dot($value, $prepend . $key . '.'));
+                static::dotInto($results, $value, $prepend . $key . '.');
             } else {
                 $results[$prepend . $key] = $value;
             }
         }
-
-        return $results;
     }
 
     /**
@@ -920,24 +949,27 @@ class Arrays
      */
     public static function sort($array, $callback = null)
     {
-        $items = $array;
-
         if (is_null($callback)) {
+            $items = $array;
+
             asort($items);
 
             return $items;
         }
 
-        uasort($items, function ($a, $b) use ($callback) {
-            $aValue = is_callable($callback) ? call_user_func($callback, $a) : Objects::get($a, $callback);
-            $bValue = is_callable($callback) ? call_user_func($callback, $b) : Objects::get($b, $callback);
+        $results = array();
 
-            if ($aValue == $bValue) {
-                return 0;
-            }
+        foreach ($array as $key => $value) {
+            $results[$key] = is_callable($callback) ? call_user_func($callback, $value) : Objects::get($value, $callback);
+        }
 
-            return $aValue < $bValue ? -1 : 1;
-        });
+        asort($results);
+
+        $items = array();
+
+        foreach (array_keys($results) as $key) {
+            $items[$key] = $array[$key];
+        }
 
         return $items;
     }

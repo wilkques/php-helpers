@@ -282,11 +282,19 @@ class Collections implements \ArrayAccess, \Countable, \IteratorAggregate
         return $this->filter(function ($item) use ($key, &$exists) {
             $id = is_callable($key) ? call_user_func($key, $item) : Objects::get($item, $key);
 
-            if (in_array($id, $exists, true)) {
+            if (is_object($id)) {
+                $hashKey = 'o:' . spl_object_hash($id);
+            } elseif (is_array($id)) {
+                $hashKey = 'a:' . serialize($id);
+            } else {
+                $hashKey = gettype($id) . ':' . $id;
+            }
+
+            if (isset($exists[$hashKey])) {
                 return false;
             }
 
-            $exists[] = $id;
+            $exists[$hashKey] = true;
 
             return true;
         });

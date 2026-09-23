@@ -910,6 +910,27 @@ class ArraysTest extends TestCase
         );
     }
 
+    public function testFieldsUsesFirstOccurrenceWhenSortHasDuplicates()
+    {
+        $array = Arrays::fields(
+            array(
+                'a' => 1,
+                'b' => 2,
+                'c' => 1,
+            ),
+            array(
+                2, 1, 1
+            )
+        );
+
+        $this->assertEquals(
+            array(
+                'b', 'a', 'c'
+            ),
+            array_keys($array)
+        );
+    }
+
     public function testValue()
     {
         $this->assertThat(Arrays::value(array()), $this->isType('array'));
