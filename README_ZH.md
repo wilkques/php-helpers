@@ -93,6 +93,15 @@ $config->db['port']; // 5432
 data_get($config, 'db.host');
 ```
 
+`{first}`/`{last}` 這種 segment 會取目前目標依插入順序的第一個/最後一個 key；若字面上的 key 就叫 `*`、`{first}` 或 `{last}`，前面加反斜線跳脫即可：
+
+```php
+Objects::get(['one', 'two', 'three'], '{first}'); // 'one'
+Objects::get(['one', 'two', 'three'], '{last}');  // 'three'
+
+Objects::get(['{first}' => 'literal'], '\{first}'); // 'literal'
+```
+
 ### Collections
 
 `collect()`（或 `new Collections($items)`）可以把陣列、JSON 字串、`Traversable`、或 `JsonSerializable` 包裝成一個可鏈式呼叫、每次操作都回傳新實例（immutable-per-call）的 collection——實作了 `Countable`、`IteratorAggregate`、`ArrayAccess`。
@@ -239,7 +248,7 @@ $cart->all(); // ['total' => 100, 'currency' => 'USD']
 
 | 方法 | 說明 | 範例 |
 | --- | --- | --- |
-| `get($target, $key, $default = null)` | 用 dot notation 從陣列或物件取值。 | `Objects::get($config, 'db.host'); // 'localhost'` |
+| `get($target, $key, $default = null)` | 用 dot notation 從陣列或物件取值。支援 `{first}`/`{last}` 指令與 `\*`/`\{first}`/`\{last}` 跳脫語法。 | `Objects::get($config, 'db.host'); // 'localhost'` |
 | `set(&$target, $key, $value, $overwrite = true)` | 用 dot notation 對陣列或物件設值。 | `Objects::set($config, 'db.port', 5432); // $config->db['port'] === 5432` |
 | `exists($array, $key)` | 檢查 key 是否存在（陣列或 `ArrayAccess`）。 | `Objects::exists(['name' => 'Wilkques'], 'name'); // true` |
 | `accessible($value)` | 判斷值是否為陣列可存取（array-accessible）。 | `Objects::accessible([]); // true` |
@@ -274,10 +283,10 @@ $cart->all(); // ['total' => 100, 'currency' => 'USD']
 | `collapse()` | 把「collection 的陣列」合併成單一層。 | `collect([[1, 2], [3, 4]])->collapse()->all(); // [1, 2, 3, 4]` |
 | `sort($callback = null)` | 依值、callback、或 dot-notation key 排序。 | `collect([3, 1, 2])->sort()->all(); // [1 => 1, 2 => 2, 0 => 3]` |
 | `sortDesc($callback = null)` | 由大到小排序。 | `collect([1, 3, 2])->sortDesc()->all(); // [1 => 3, 2 => 2, 0 => 1]` |
-| `sortBy($callback)` | `sort()` 的別名。 | `collect([['age' => 30], ['age' => 20]])->sortBy('age')->pluck('age')->all(); // [20, 30]` |
-| `sortByDesc($callback)` | `sortDesc()` 的別名。 | `collect([['age' => 30], ['age' => 20]])->sortByDesc('age')->pluck('age')->all(); // [30, 20]` |
+| `sortBy($callback, $options = SORT_REGULAR, $descending = false)` | 依單一 key/callback 排序，或傳入 `[key, 'asc'\|'desc']` 陣列做多欄位排序（依序 tie-break）。`$options` 可用一般的 `SORT_*` 旗標。 | `collect([['age' => 30, 'name' => 'b'], ['age' => 30, 'name' => 'a'], ['age' => 20, 'name' => 'c']])->sortBy([['age', 'desc'], 'name'])->pluck('name')->all(); // ['a', 'b', 'c']` |
+| `sortByDesc($callback, $options = SORT_REGULAR)` | 降冪排序，接受跟 `sortBy()` 一樣的單一/多欄位陣列參數。 | `collect([['age' => 30], ['age' => 20]])->sortByDesc('age')->pluck('age')->all(); // [30, 20]` |
 | `chunk($size)` | 拆成一個「裝著多個 collection」的 collection。 | `collect([1, 2, 3, 4, 5])->chunk(2)->count(); // 3（大小分別是 2、2、1）` |
-| `groupBy($groupBy)` | 依 callback 或 dot-notation key 分組。 | `collect([['type' => 'a', 'v' => 1], ['type' => 'b', 'v' => 2]])->groupBy('type')->get('a')->pluck('v')->all(); // [1]` |
+| `groupBy($groupBy, $preserveKeys = false)` | 依 callback 或 dot-notation key 分組，或傳入陣列做多層巢狀分組。單一 retriever 也可以回傳陣列，讓一筆資料同時歸入多個分組。`$preserveKeys` 保留原始 key，不重新編號。 | `collect([['type' => 'a', 'sub' => 'x'], ['type' => 'a', 'sub' => 'y'], ['type' => 'b', 'sub' => 'x']])->groupBy(['type', 'sub'])->get('a')->get('x')->count(); // 1` |
 | `keyBy($keyBy)` | 依 callback 或 dot-notation key 重新設定 key。 | `collect([['id' => 1, 'name' => 'a']])->keyBy('id')->get(1); // ['id' => 1, 'name' => 'a']` |
 | `implode($value, $glue = null)` | 串接純量項目，或先 pluck 再串接（陣列的陣列時）。 | `collect(['a', 'b', 'c'])->implode(','); // 'a,b,c'` |
 | `reduce($callback, $initial = null)` | 歸約成單一值。 | `collect([1, 2, 3])->reduce(function ($c, $n) { return $c + $n; }, 0); // 6` |

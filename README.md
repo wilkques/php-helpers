@@ -93,6 +93,15 @@ $config->db['port']; // 5432
 data_get($config, 'db.host');
 ```
 
+`{first}`/`{last}` segments resolve to the current target's first/last key (by insertion order); escape a literal `*`, `{first}`, or `{last}` key with a leading backslash:
+
+```php
+Objects::get(['one', 'two', 'three'], '{first}'); // 'one'
+Objects::get(['one', 'two', 'three'], '{last}');  // 'three'
+
+Objects::get(['{first}' => 'literal'], '\{first}'); // 'literal'
+```
+
 ### Collections
 
 `collect()` (or `new Collections($items)`) wraps an array, JSON string, `Traversable`, or `JsonSerializable` into a chainable, immutable-per-call collection — implementing `Countable`, `IteratorAggregate` and `ArrayAccess`.
@@ -239,7 +248,7 @@ Dot-notation get/set that works across **mixed** arrays and objects (property ac
 
 | Method | Description | Example |
 | --- | --- | --- |
-| `get($target, $key, $default = null)` | Get a value from an array or object using dot notation. | `Objects::get($config, 'db.host'); // 'localhost'` |
+| `get($target, $key, $default = null)` | Get a value from an array or object using dot notation. Supports `{first}`/`{last}` directives and `\*`/`\{first}`/`\{last}` escaping. | `Objects::get($config, 'db.host'); // 'localhost'` |
 | `set(&$target, $key, $value, $overwrite = true)` | Set a value on an array or object using dot notation. | `Objects::set($config, 'db.port', 5432); // $config->db['port'] === 5432` |
 | `exists($array, $key)` | Check if a key exists (array or `ArrayAccess`). | `Objects::exists(['name' => 'Wilkques'], 'name'); // true` |
 | `accessible($value)` | Determine if a value is array-accessible. | `Objects::accessible([]); // true` |
@@ -274,10 +283,10 @@ Dot-notation get/set that works across **mixed** arrays and objects (property ac
 | `collapse()` | Collapse a collection of arrays into one level. | `collect([[1, 2], [3, 4]])->collapse()->all(); // [1, 2, 3, 4]` |
 | `sort($callback = null)` | Sort by value, callback, or dot-notation key. | `collect([3, 1, 2])->sort()->all(); // [1 => 1, 2 => 2, 0 => 3]` |
 | `sortDesc($callback = null)` | Sort descending. | `collect([1, 3, 2])->sortDesc()->all(); // [1 => 3, 2 => 2, 0 => 1]` |
-| `sortBy($callback)` | Alias of `sort()`. | `collect([['age' => 30], ['age' => 20]])->sortBy('age')->pluck('age')->all(); // [20, 30]` |
-| `sortByDesc($callback)` | Alias of `sortDesc()`. | `collect([['age' => 30], ['age' => 20]])->sortByDesc('age')->pluck('age')->all(); // [30, 20]` |
+| `sortBy($callback, $options = SORT_REGULAR, $descending = false)` | Sort by a key/callback, or by an array of `[key, 'asc'\|'desc']` pairs for multi-column sort with tie-breaking. `$options` accepts the usual `SORT_*` flags. | `collect([['age' => 30, 'name' => 'b'], ['age' => 30, 'name' => 'a'], ['age' => 20, 'name' => 'c']])->sortBy([['age', 'desc'], 'name'])->pluck('name')->all(); // ['a', 'b', 'c']` |
+| `sortByDesc($callback, $options = SORT_REGULAR)` | Sort descending; accepts the same key/callback/multi-column-array forms as `sortBy()`. | `collect([['age' => 30], ['age' => 20]])->sortByDesc('age')->pluck('age')->all(); // [30, 20]` |
 | `chunk($size)` | Split into a collection of collections. | `collect([1, 2, 3, 4, 5])->chunk(2)->count(); // 3 (sizes 2, 2, 1)` |
-| `groupBy($groupBy)` | Group by a callback or dot-notation key. | `collect([['type' => 'a', 'v' => 1], ['type' => 'b', 'v' => 2]])->groupBy('type')->get('a')->pluck('v')->all(); // [1]` |
+| `groupBy($groupBy, $preserveKeys = false)` | Group by a callback or dot-notation key, or by an array of them for multi-level nested grouping. A retriever may also return an array of keys to put one item into multiple groups. `$preserveKeys` keeps original array keys instead of re-indexing. | `collect([['type' => 'a', 'sub' => 'x'], ['type' => 'a', 'sub' => 'y'], ['type' => 'b', 'sub' => 'x']])->groupBy(['type', 'sub'])->get('a')->get('x')->count(); // 1` |
 | `keyBy($keyBy)` | Re-key by a callback or dot-notation key. | `collect([['id' => 1, 'name' => 'a']])->keyBy('id')->get(1); // ['id' => 1, 'name' => 'a']` |
 | `implode($value, $glue = null)` | Join scalar items, or pluck-then-join for arrays of arrays. | `collect(['a', 'b', 'c'])->implode(','); // 'a,b,c'` |
 | `reduce($callback, $initial = null)` | Reduce to a single value. | `collect([1, 2, 3])->reduce(function ($c, $n) { return $c + $n; }, 0); // 6` |
