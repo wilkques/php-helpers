@@ -648,7 +648,13 @@ class Arrays
             return empty($array) ? static::value($default) : end($array);
         }
 
-        return static::first(array_reverse($array, true), $callback, $default);
+        for ($value = end($array), $key = key($array); $key !== null; $value = prev($array), $key = key($array)) {
+            if ($callback($value, $key)) {
+                return $value;
+            }
+        }
+
+        return static::value($default);
     }
 
     /**
@@ -759,21 +765,32 @@ class Arrays
     {
         $result = array();
 
+        static::flattenInto($result, $array, $depth);
+
+        return $result;
+    }
+
+    /**
+     * Flatten a multi-dimensional array into the given result array by reference.
+     *
+     * @param  array  $result
+     * @param  iterable  $array
+     * @param  int  $depth
+     * @return void
+     */
+    protected static function flattenInto(&$result, $array, $depth)
+    {
         foreach ($array as $item) {
             if (!is_array($item)) {
                 $result[] = $item;
-            } else {
-                $values = $depth === 1
-                    ? array_values($item)
-                    : static::flatten($item, $depth - 1);
-
-                foreach ($values as $value) {
+            } elseif ($depth === 1) {
+                foreach (array_values($item) as $value) {
                     $result[] = $value;
                 }
+            } else {
+                static::flattenInto($result, $item, $depth - 1);
             }
         }
-
-        return $result;
     }
 
     /**

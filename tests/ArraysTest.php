@@ -1348,6 +1348,21 @@ class ArraysTest extends TestCase
             ),
             7
         );
+
+        $this->assertEquals(
+            'match',
+            Arrays::last(
+                array(
+                    'first' => 'skip',
+                    0 => 'skip',
+                    'target' => 'match',
+                    1 => 'skip-too',
+                ),
+                function ($value, $key) {
+                    return $key === 'target';
+                }
+            )
+        );
     }
 
     public function testDivide()
@@ -1429,6 +1444,30 @@ class ArraysTest extends TestCase
                 )
             ),
             array(123, 456, 123)
+        );
+
+        // 兩層以上巢狀，$depth 不限（全展開），走到 flattenInto() 的遞迴分支
+        $this->assertEquals(
+            array('a', 'b', 'c', 'd', 'e'),
+            Arrays::flatten(
+                array(
+                    array('a', 'b', array('c', 'd')),
+                    array('e'),
+                )
+            )
+        );
+
+        // 同樣的兩層以上巢狀資料，但 $depth = 1，只展開一層，走到 flattenInto() 的
+        // $depth === 1 分支，內層的 array('c', 'd') 應該原樣保留、不再往下展開
+        $this->assertEquals(
+            array('a', 'b', array('c', 'd'), 'e'),
+            Arrays::flatten(
+                array(
+                    array('a', 'b', array('c', 'd')),
+                    array('e'),
+                ),
+                1
+            )
         );
     }
 
