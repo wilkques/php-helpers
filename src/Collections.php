@@ -396,31 +396,49 @@ class Collections implements \ArrayAccess, \Countable, \IteratorAggregate
      */
     protected function sortByMany($comparisons = array(), $options = SORT_REGULAR)
     {
+        $normalizedComparisons = array();
+
+        foreach ($comparisons as $comparison) {
+            $comparison = Arrays::wrap($comparison);
+
+            $prop = $comparison[0];
+
+            $ascending = !isset($comparison[1]) || $comparison[1] === true || $comparison[1] === 'asc';
+
+            $normalizedComparisons[] = array(
+                'prop' => $prop,
+                'ascending' => $ascending,
+                'raw' => !is_string($prop) && is_callable($prop),
+            );
+        }
+
         $decorated = array();
         $sequence = 0;
 
         foreach ($this->items as $key => $value) {
-            $decorated[] = array('key' => $key, 'value' => $value, 'seq' => $sequence);
+            $sortValues = array();
+
+            foreach ($normalizedComparisons as $i => $comparison) {
+                if (!$comparison['raw']) {
+                    $sortValues[$i] = Objects::get($value, $comparison['prop']);
+                }
+            }
+
+            $decorated[] = array('key' => $key, 'value' => $value, 'sort' => $sortValues, 'seq' => $sequence);
 
             $sequence++;
         }
 
         $that = $this;
 
-        usort($decorated, function ($a, $b) use ($that, $comparisons, $options) {
-            foreach ($comparisons as $comparison) {
-                $comparison = Arrays::wrap($comparison);
-
-                $prop = $comparison[0];
-
-                $ascending = !isset($comparison[1]) || $comparison[1] === true || $comparison[1] === 'asc';
-
-                if (!is_string($prop) && is_callable($prop)) {
-                    $result = call_user_func($prop, $a['value'], $b['value']);
+        usort($decorated, function ($a, $b) use ($that, $normalizedComparisons, $options) {
+            foreach ($normalizedComparisons as $i => $comparison) {
+                if ($comparison['raw']) {
+                    $result = call_user_func($comparison['prop'], $a['value'], $b['value']);
                 } else {
-                    $result = $that->compareSortValues(Objects::get($a['value'], $prop), Objects::get($b['value'], $prop), $options);
+                    $result = $that->compareSortValues($a['sort'][$i], $b['sort'][$i], $options);
 
-                    if (!$ascending) {
+                    if (!$comparison['ascending']) {
                         $result = -$result;
                     }
                 }
