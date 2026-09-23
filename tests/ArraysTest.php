@@ -452,6 +452,64 @@ class ArraysTest extends TestCase
         $this->assertNull(Arrays::get($array, 'user.missing.name'));
 
         $this->assertNull(Arrays::get($array, 'user.profile.name.too.deep'));
+
+        // a literal key containing a dot takes priority over dot-notation
+        // traversal (the exists() check on the whole key runs first)
+        $literalArray = array('products.desk' => array('price' => 100));
+
+        $this->assertEquals(array('price' => 100), Arrays::get($literalArray, 'products.desk'));
+
+        // a key that exists with a null value returns null, not the default
+        $nullArray = array('foo' => null, 'bar' => array('baz' => null));
+
+        $this->assertNull(Arrays::get($nullArray, 'foo', 'default'));
+
+        $this->assertNull(Arrays::get($nullArray, 'bar.baz', 'default'));
+
+        // ArrayAccess objects, standalone and nested inside a plain array
+        $arrayAccessObject = new \ArrayObject(array('products' => array('desk' => array('price' => 100))));
+
+        $this->assertEquals(array('price' => 100), Arrays::get($arrayAccessObject, 'products.desk'));
+
+        $nestedArrayAccess = array('child' => new \ArrayObject(array('products' => array('desk' => array('price' => 100)))));
+
+        $this->assertEquals(array('price' => 100), Arrays::get($nestedArrayAccess, 'child.products.desk'));
+
+        // a null key returns the whole array
+        $listArray = array('foo', 'bar');
+
+        $this->assertEquals($listArray, Arrays::get($listArray, null));
+
+        // a non-array/non-accessible $array always falls through to default
+        $this->assertSame('default', Arrays::get(null, 'foo', 'default'));
+
+        $this->assertSame('default', Arrays::get(false, 'foo', 'default'));
+
+        $this->assertSame('default', Arrays::get(null, null, 'default'));
+
+        // numeric segments in the dotted path
+        $products = array('products' => array(
+            array('name' => 'desk'),
+            array('name' => 'chair'),
+        ));
+
+        $this->assertSame('desk', Arrays::get($products, 'products.0.name'));
+
+        $this->assertSame('chair', Arrays::get($products, 'products.1.name'));
+
+        // default may be a Closure, resolved lazily
+        $this->assertSame('dayle', Arrays::get(
+            array('names' => array('developer' => 'taylor')),
+            'names.otherDeveloper',
+            function () {
+                return 'dayle';
+            }
+        ));
+
+        // empty-string key segments
+        $this->assertSame('bar', Arrays::get(array('' => 'bar'), ''));
+
+        $this->assertSame('bar', Arrays::get(array('' => array('' => 'bar')), '.'));
     }
 
     public function testAccessible()
