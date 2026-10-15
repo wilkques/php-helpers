@@ -1,5 +1,5 @@
 {
-    "name": "wilkques/php-helper",
+    "name": "wilkques/helper",
     "type": "library",
     "license": "MIT",
     "autoload": {
@@ -17,6 +17,9 @@
     },
     "require": {
         "php": ">=5.3"
+    },
+    "replace": {
+        "wilkques/php-helper": "self.version"
     },
     "require-dev": {
         "phpunit/phpunit": "*"

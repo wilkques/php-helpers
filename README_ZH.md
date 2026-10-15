@@ -1,7 +1,7 @@
 # Helper for PHP
 [![TESTS](https://github.com/wilkques/php-helpers/actions/workflows/github-ci.yml/badge.svg)](https://github.com/wilkques/php-helpers/actions/workflows/github-ci.yml)
-[![Latest Stable Version](https://poser.pugx.org/wilkques/php-helper/v/stable)](https://packagist.org/packages/wilkques/php-helper)
-[![License](https://poser.pugx.org/wilkques/php-helper/license)](https://packagist.org/packages/wilkques/php-helper)
+[![Latest Stable Version](https://poser.pugx.org/wilkques/helper/v/stable)](https://packagist.org/packages/wilkques/helper)
+[![License](https://poser.pugx.org/wilkques/helper/license)](https://packagist.org/packages/wilkques/helper)
 
 [English](README.md) | 繁體中文
 
@@ -14,7 +14,7 @@
 ## 安裝
 
 ````
-composer require wilkques/php-helper
+composer require wilkques/helper
 ````
 
 ## 使用方式
